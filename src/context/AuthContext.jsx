@@ -1,10 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-// interface AuthContextType {
-//   user: string | null;
-//   login: (username: string) => void;
-//   logout: () => void;
-// }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
