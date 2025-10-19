@@ -27,6 +27,7 @@ export default function PortfolioOverview() {
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-neutral-900 dark:border-neutral-800">
       <h2 className="text-lg font-semibold mb-4">Portfolio Overview</h2>
+      <hr />
 
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">

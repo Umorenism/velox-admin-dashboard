@@ -35,7 +35,7 @@ export default function SideBar() {
   ];
 
   return (
-    <aside className="w-72 bg-white dark:bg-gray-900 shadow-md h-screen p-4 hidden md:flex flex-col justify-between">
+    <aside className="w-72 bg-white dark:bg-neutral-900 dark:text-white shadow-md h-screen p-4 hidden md:flex flex-col justify-between">
       {/* ---- Top Section ---- */}
       <div>
         {/* Logo */}

@@ -8,7 +8,7 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 bg-white dark:bg-gray-800 shadow-md">
+    <header className="flex items-center justify-between px-6 py-3 bg-white dark:bg-neutral-900 dark:text-white shadow-md">
       {/* LEFT SECTION — SEARCH BAR */}
       <div className="flex items-center space-x-3 w-full max-w-md">
         <div className="relative w-full">
@@ -19,7 +19,7 @@ export default function Header() {
           <input
             type="text"
             placeholder="Search..."
-            className="w-full pl-9 pr-4 py-2  dark:border-gray-700 rounded-[6px] dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00A991] transition"
+            className="w-full pl-9 pr-4 py-2   rounded-[6px] bg-transparent text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00A991] transition"
           />
         </div>
       </div>

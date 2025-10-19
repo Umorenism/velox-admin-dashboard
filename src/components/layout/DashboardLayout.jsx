@@ -10,7 +10,7 @@ export default function DashboardLayout() {
       <SideBar />
       <div className="flex flex-col flex-1">
         <Header />
-        <main className="flex-1 overflow-y-auto p-4">
+        <main className="flex-1 overflow-y-auto p-4 dark:bg-neutral-900 dark:text-white">
           <Outlet />
         </main>
       </div>
