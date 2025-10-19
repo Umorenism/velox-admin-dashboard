@@ -5,7 +5,8 @@ import { RiMenuFoldLine } from "react-icons/ri";
 import { CiWarning } from "react-icons/ci";
 
 import { Search, Filter, Upload } from "lucide-react";
-import Table from "../../utlis/Table";
+
+import UserTable from "../../utlis/UserTable";
 export default function UsersManagement() {
   const referralLink = "https://microtrade.com";
   const [activeTab, setActiveTab] = useState("all");
@@ -88,7 +89,7 @@ export default function UsersManagement() {
         </div>
 
         <div>
-          <Table />
+          <UserTable />
         </div>
       </motion.div>
     </motion.div>
