@@ -4,11 +4,13 @@ import React from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import Login from "../pages/Login";
-import Users from "../pages/Dashboard/Users";
 
-import Reports from "../pages/Dashboard/Reports";
+
+
 import Settings from "../pages/Dashboard/Settings";
 import Dashboardpage from "../pages/Dashboard/Dashboardpage";
+import Packages from "../pages/Dashboard/Packages";
+import UsersMangement from "../pages/Dashboard/UsersManagement";
 
 export default function AppRouter() {
   return (
@@ -28,8 +30,8 @@ export default function AppRouter() {
       >
         {/* Example nested routes */}
          <Route index element={<Dashboardpage/>} />
-        <Route path="users" element={<Users />} />
-        <Route path="reports" element={<Reports />} />
+        <Route path="users" element={<UsersMangement />} />
+        <Route path="package" element={<Packages />} />
         <Route path="settings" element={<Settings />} /> 
       </Route>
 
