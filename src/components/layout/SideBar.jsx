@@ -157,9 +157,9 @@ export default function SideBar({ closeSidebar }) {
               <img
                 src={profilePic}
                 alt="Admin"
-                className="w-10 h-10 rounded-full object-cover border border-gray-300 dark:border-gray-700"
+                className="w-20 h-20 rounded-full object-cover border border-gray-300 dark:border-gray-700"
               />
-              <div className="absolute bottom-0 -right-1 h-4 w-4 bg-blue-500 rounded-full flex justify-center items-center">
+              <div className="absolute bottom-5 right-2 h-4 w-4 bg-blue-500 rounded-full flex justify-center items-center">
                 <span className="text-white text-[5px] font-bold">✔</span>
               </div>
             </div>

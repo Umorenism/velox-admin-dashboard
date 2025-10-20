@@ -18,7 +18,7 @@ const NotificationSettings = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-lg shadow border border-gray-200 p-6 space-y-6">
+    <div className="max-w-[1600px] dark:bg-neutral-800 dark:text-white w-full mx-auto bg-white rounded-lg shadow border border-gray-200 p-6 space-y-6">
       {/* Notification Toggles */}
       <div className="space-y-5">
         {[
@@ -55,11 +55,11 @@ const NotificationSettings = () => {
         ].map(({ key, title, desc }) => (
           <div
             key={key}
-            className="flex justify-between items-start border-b border-gray-100 pb-3 last:border-none"
+            className="flex justify-between dark:text-white items-start border-b border-gray-100 pb-3 last:border-none"
           >
             <div>
-              <h3 className="text-gray-800 font-medium text-sm">{title}</h3>
-              <p className="text-gray-500 text-xs mt-1">{desc}</p>
+              <h3 className="text-gray-800 font-medium dark:text-white text-sm">{title}</h3>
+              <p className="text-gray-500 text-xs mt-1 dark:text-white">{desc}</p>
             </div>
             <button
               type="button"
@@ -80,7 +80,7 @@ const NotificationSettings = () => {
 
       {/* Email Notification Section */}
       <div className="pt-4 border-t border-gray-200 space-y-5">
-        <h3 className="text-gray-800 font-semibold text-sm">Email Notification</h3>
+        <h3 className="text-gray-800 font-semibold text-sm dark:text-white">Email Notification</h3>
         {[
           {
             key: "communicationEmail",
@@ -95,11 +95,11 @@ const NotificationSettings = () => {
         ].map(({ key, title, desc }) => (
           <div
             key={key}
-            className="flex justify-between items-start border-b border-gray-100 pb-3 last:border-none"
+            className="flex justify-between dark:text-white items-start border-b border-gray-100 pb-3 last:border-none"
           >
             <div>
-              <h3 className="text-gray-800 font-medium text-sm">{title}</h3>
-              <p className="text-gray-500 text-xs mt-1">{desc}</p>
+              <h3 className="text-gray-800 font-medium dark:text-white text-sm">{title}</h3>
+              <p className="text-gray-500 text-xs dark:text-white mt-1">{desc}</p>
             </div>
             <button
               type="button"
@@ -120,13 +120,13 @@ const NotificationSettings = () => {
 
       {/* Sounds Section */}
       <div className="pt-4 border-t border-gray-200 space-y-5">
-        <h3 className="text-gray-800 font-semibold text-sm">Sounds</h3>
-        <div className="flex justify-between items-start">
+        <h3 className="text-gray-800 font-semibold text-sm dark:text-white">Sounds</h3>
+        <div className="flex justify-between dark:text-white items-start">
           <div>
-            <h3 className="text-gray-800 font-medium text-sm">
+            <h3 className="text-gray-800 dark:text-white font-medium text-sm">
               Disable All Notification Sounds
             </h3>
-            <p className="text-gray-500 text-xs mt-1">
+            <p className="text-gray-500 dark:text-white text-xs mt-1">
               Receive notification of all messages, contract, reminders, contract agreements
             </p>
           </div>

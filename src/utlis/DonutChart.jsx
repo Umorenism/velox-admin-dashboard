@@ -54,7 +54,7 @@ const renderCustomLabel = ({
 
 const DonutChart = () => {
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-4 w-full mx-auto">
+    <div className="bg-white dark:bg-neutral-900  border-neutral-200 dark:border-neutral-800 shadow-sm p-4 w-full mx-auto">
       <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-2">
         Users on activated Packages ($)
       </h2>

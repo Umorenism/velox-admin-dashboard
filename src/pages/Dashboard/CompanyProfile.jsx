@@ -1,0 +1,56 @@
+
+
+
+
+
+
+
+import React from "react";
+import { motion } from "framer-motion";
+import { RiMenuFoldLine } from "react-icons/ri";
+import CompanyInformationForm from "../../utlis/CompanyInformationForm";
+
+export default function CompanyProfile() {
+  const fadeUp = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate="show"
+      className="flex flex-col items-center justify-start  dark:bg-neutral-900 dark:text-white min-h-screen px-4 sm:px-6 py-6"
+    >
+      {/* Wrapper */}
+      <motion.div
+        variants={fadeUp}
+        className="w-full max-w-[1400px]  dark:bg-neutral-800  p-4 sm:p-6 transition-all duration-300"
+      >
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          {/* Title & Icon */}
+          <div className="flex items-center gap-3">
+            <RiMenuFoldLine
+              size={28}
+              className="text-gray-800 dark:text-gray-100"
+            />
+            <h1 className="text-xl dark:bg-neutral-800 dark:text-white sm:text-2xl font-semibold text-gray-900 dark:text-white">
+              Company Profile Settings
+            </h1>
+          </div>
+
+          {/* Save Button */}
+          <button className="bg-[#00A991] hover:bg-[#008f7c] text-white font-medium text-sm sm:text-base rounded-lg py-2 px-6 sm:px-10 transition duration-300 w-full sm:w-auto">
+            Save
+          </button>
+        </div>
+
+        {/* Form Section */}
+        <div className="w-full dark:bg-neutral-800 dark:text-white overflow-x-auto">
+          <CompanyInformationForm />
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}

@@ -15,6 +15,12 @@ import LeaderManagement from "../pages/Dashboard/LeaderManagement";
 import Transaction from "../pages/Dashboard/Transaction";
 import Withdrawal from "../pages/Dashboard/Withdrawal";
 import PromotionsBanner from "../pages/Dashboard/PromotionsBanners";
+import CompanyProfile from "../pages/Dashboard/CompanyProfile";
+import Notification from "../pages/Dashboard/Notification";
+import Permission from "../pages/Dashboard/Permission";
+import NotFound from "../pages/Dashboard/NotFound";
+import CreateRole from "../pages/Dashboard/CreateRole";
+import EmailPage from "../pages/Dashboard/EmailPage";
 
 export default function AppRouter() {
   return (
@@ -41,10 +47,15 @@ export default function AppRouter() {
         <Route path="withdrawals" element={<Withdrawal />} />
         <Route path="promotions" element={<PromotionsBanner />} />
         <Route path="settings" element={<Settings />} /> 
+        <Route path="companyprofile" element={<CompanyProfile/>} /> 
+        <Route path="notifications-route" element={<Notification/>} /> 
+        <Route path="permission" element={<Permission/>} /> 
+        <Route path="create" element={<CreateRole/>} /> 
+        <Route path="email" element={<EmailPage/>} /> 
       </Route>
 
       {/* 404 fallback */}
-      {/* <Route path="*" element={<NotFound />} /> */}
+       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
