@@ -1,15 +1,9 @@
 
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RiMenuFoldLine } from "react-icons/ri";
 import { Upload } from "lucide-react";
-import pic from '../../assets/success.svg'
+import pic from "../../assets/success.svg";
 import PackageGrid from "../../utlis/PackageGrid";
 
 export default function Package() {
@@ -41,13 +35,12 @@ export default function Package() {
     setShowSuccess(true);
   };
 
-  // ✅ Function to auto-close success modal after interval
   useEffect(() => {
     let timer;
     if (showSuccess) {
       timer = setTimeout(() => {
         setShowSuccess(false);
-      }, 3000); // closes after 3 seconds
+      }, 3000);
     }
     return () => clearTimeout(timer);
   }, [showSuccess]);
@@ -56,19 +49,19 @@ export default function Package() {
     <motion.div
       initial="hidden"
       animate="show"
-      className="flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 dark:text-white mt-10"
+      className="flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 dark:text-white mt-10 px-4 sm:px-6 lg:px-8"
     >
       <motion.div variants={fadeUp} className="w-full max-w-[1500px]">
         {/* Header */}
         <div className="space-y-5">
-          <RiMenuFoldLine size={30} />
-          <div className="flex justify-between items-center">
-            <h1 className="text-[24px] font-[700] text-[#000000] dark:text-white">
+          <RiMenuFoldLine size={30} className="text-gray-700 dark:text-white" />
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <h1 className="text-[20px] sm:text-[24px] font-[700] text-[#000000] dark:text-white">
               Packages and Wallet Activity
             </h1>
             <button
               onClick={() => setShowModal(true)}
-              className="bg-[#00A991] text-white px-10 py-3 rounded-[10px]"
+              className="bg-[#00A991] text-white px-6 sm:px-10 py-3 rounded-[10px] text-sm sm:text-base hover:bg-[#00957F] transition"
             >
               Create New Package
             </button>
@@ -83,11 +76,11 @@ export default function Package() {
 
       {/* CREATE PACKAGE MODAL */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg w-[500px] p-6"
+            className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg w-full max-w-[500px] p-6 sm:p-8"
           >
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white text-center">
               Create New Package
@@ -123,7 +116,9 @@ export default function Package() {
 
             {/* Upload Image */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Upload Image</label>
+              <label className="block text-sm font-medium mb-2">
+                Upload Image
+              </label>
               <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#00A991] transition">
                 <Upload size={24} className="text-gray-500 mb-2" />
                 <input
@@ -134,15 +129,23 @@ export default function Package() {
                   className="hidden"
                   id="imageUpload"
                 />
-                <label htmlFor="imageUpload" className="text-sm text-gray-600 dark:text-gray-300">
+                <label
+                  htmlFor="imageUpload"
+                  className="text-sm text-gray-600 dark:text-gray-300"
+                >
                   Click to upload or drag and drop
                 </label>
               </div>
             </div>
 
             {/* Buttons */}
-            <div className="flex w-full space-x-3">
-              
+            <div className="flex flex-col sm:flex-row w-full sm:space-x-3 gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-gray-300 w-full hover:bg-gray-100 dark:hover:bg-neutral-700 transition"
+              >
+                Cancel
+              </button>
               <button
                 onClick={handleSubmit}
                 className="px-6 py-2 rounded-lg bg-[#00A991] text-white w-full hover:bg-green-700 transition"
@@ -156,22 +159,19 @@ export default function Package() {
 
       {/* SUCCESS MODAL */}
       {showSuccess && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg w-[400px] p-8 flex flex-col items-center justify-center text-center"
+            className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg w-full max-w-[400px] p-6 sm:p-8 flex flex-col items-center justify-center text-center"
           >
-            {/* Center Image */}
-            <img
-              src={pic}
-              alt="success"
-              className="w-20 h-20 mb-4"
-            />
+            <img src={pic} alt="success" className="w-20 h-20 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Package Created for User 3863 successfully
+              Package Created Successfully!
             </h3>
-           
+            <p className="text-sm text-gray-500 dark:text-gray-300 mt-2">
+              The new package has been added successfully.
+            </p>
           </motion.div>
         </div>
       )}

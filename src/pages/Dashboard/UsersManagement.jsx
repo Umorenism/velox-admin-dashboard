@@ -10,27 +10,27 @@ import UserTable from "../../utlis/UserTable";
 export default function UsersManagement() {
   
 
-  const wallets = [
-    { id: 1, title: "Deposit Wallet", amount: "0.00 USD" },
-    { id: 2, title: "USD Wallet", amount: "0.00 USD" },
-    { id: 3, title: "IB Wallet", amount: "0.00 USD" },
-    { id: 4, title: "Credit Wallet", amount: "0.00 USD" },
-  ];
+  // const wallets = [
+  //   { id: 1, title: "Deposit Wallet", amount: "0.00 USD" },
+  //   { id: 2, title: "USD Wallet", amount: "0.00 USD" },
+  //   { id: 3, title: "IB Wallet", amount: "0.00 USD" },
+  //   { id: 4, title: "Credit Wallet", amount: "0.00 USD" },
+  // ];
 
-  const data = [
-    {
-      title: "Opix Algo Lite",
-      des: "Fully automated algorithmic trading that uses advanced order flow strategy, money management and probabilistic analysis.",
-    },
-    {
-      title: "Opix Algo Pro",
-      des: "Fine-tuned automated trading improving as it learns through self-optimization. Equity protection, order flow strategy, and money management.",
-    },
-    {
-      title: "Opix Algo Expert",
-      des: "Next generation algorithmic trading providing unique stability. Volume-based trading, equity protection, and probabilistic analysis.",
-    },
-  ];
+  // const data = [
+  //   {
+  //     title: "Opix Algo Lite",
+  //     des: "Fully automated algorithmic trading that uses advanced order flow strategy, money management and probabilistic analysis.",
+  //   },
+  //   {
+  //     title: "Opix Algo Pro",
+  //     des: "Fine-tuned automated trading improving as it learns through self-optimization. Equity protection, order flow strategy, and money management.",
+  //   },
+  //   {
+  //     title: "Opix Algo Expert",
+  //     des: "Next generation algorithmic trading providing unique stability. Volume-based trading, equity protection, and probabilistic analysis.",
+  //   },
+  // ];
 
   // Animation variants
   const fadeUp = {

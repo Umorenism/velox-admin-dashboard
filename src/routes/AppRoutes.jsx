@@ -14,6 +14,7 @@ import UsersMangement from "../pages/Dashboard/UsersManagement";
 import LeaderManagement from "../pages/Dashboard/LeaderManagement";
 import Transaction from "../pages/Dashboard/Transaction";
 import Withdrawal from "../pages/Dashboard/Withdrawal";
+import PromotionsBanner from "../pages/Dashboard/PromotionsBanners";
 
 export default function AppRouter() {
   return (
@@ -38,6 +39,7 @@ export default function AppRouter() {
         <Route path="package" element={<Packages />} />
         <Route path="transactions" element={<Transaction />} />
         <Route path="withdrawals" element={<Withdrawal />} />
+        <Route path="promotions" element={<PromotionsBanner />} />
         <Route path="settings" element={<Settings />} /> 
       </Route>
 
