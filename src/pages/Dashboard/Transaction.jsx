@@ -1,35 +1,18 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { RiMenuFoldLine } from "react-icons/ri";
-
-
+import { DollarSign } from "lucide-react";
 
 import { Search, Filter, Upload } from "lucide-react";
 
-import UserTable from "../../utlis/UserTable";
-export default function UsersManagement() {
-  
 
-  const wallets = [
-    { id: 1, title: "Deposit Wallet", amount: "0.00 USD" },
-    { id: 2, title: "USD Wallet", amount: "0.00 USD" },
-    { id: 3, title: "IB Wallet", amount: "0.00 USD" },
-    { id: 4, title: "Credit Wallet", amount: "0.00 USD" },
-  ];
-
+import TransactionTable from "../../utlis/TransactionTable";
+export default function Transaction() {
   const data = [
-    {
-      title: "Opix Algo Lite",
-      des: "Fully automated algorithmic trading that uses advanced order flow strategy, money management and probabilistic analysis.",
-    },
-    {
-      title: "Opix Algo Pro",
-      des: "Fine-tuned automated trading improving as it learns through self-optimization. Equity protection, order flow strategy, and money management.",
-    },
-    {
-      title: "Opix Algo Expert",
-      des: "Next generation algorithmic trading providing unique stability. Volume-based trading, equity protection, and probabilistic analysis.",
-    },
+    { title: "Deposit", amount: "0.00", currency: "USD" },
+    { title: "Withdrawal", amount: "700", currency: "USD" },
+    { title: "Transfers", amount: "560", currency: "USD" },
+    
   ];
 
   // Animation variants
@@ -52,8 +35,59 @@ export default function UsersManagement() {
         <div className="space-y-5 ">
           <RiMenuFoldLine size={30} />
           <h1 className="text-[24px] font-[700] text-[#000000] dark:text-white">
-            User Management
+            Transactions
           </h1>
+        </div>
+        <div>
+          <div
+            initial="hidden"
+            animate="visible"
+            className="flex  justify-between gap-4"
+          >
+            {data.map((item, index) => (
+              <div
+                key={index}
+                variants={fadeUp}
+                custom={index}
+                className="flex h-[200px] flex-col  items-start w-full 
+                        rounded-xl p-4 shadow-md
+                        bg-white dark:bg-neutral-900 dark:text-white
+                        border border-gray-100 dark:border-neutral-800
+                        hover:shadow-lg transition-all duration-300"
+              >
+                <div className="flex items-center justify-between w-full mb-2">
+                  <h3 className="text-[15px] font-semibold text-left">
+                    {item.title}
+                  </h3>
+
+                  <div
+                    className="w-7 h-7 rounded-full bg-gray-100 dark:bg-neutral-800 
+                          flex justify-center items-center border border-gray-300 dark:border-neutral-700"
+                  >
+                    <DollarSign
+                      size={16}
+                      color={
+                        window.matchMedia("(prefers-color-scheme: dark)")
+                          .matches
+                          ? "#ccc"
+                          : "#333"
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t border-neutral-200 dark:border-neutral-800 w-full mt-3 pt-2 text-left">
+                  <span className="text-[50px] font-bold text-green-600 dark:text-green-400">
+                    {item.amount}
+                    <span className="text-[14px] ml-1 text-green-600 dark:text-green-400">
+                      {item.currency}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div></div>
         </div>
 
         <div className="flex mb-10 mt-5 flex-wrap items-center gap-3 dark:bg-neutral-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-800">
@@ -87,7 +121,7 @@ export default function UsersManagement() {
         </div>
 
         <div>
-          <UserTable />
+          <TransactionTable/>
         </div>
       </motion.div>
     </motion.div>

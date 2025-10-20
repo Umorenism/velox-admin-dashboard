@@ -11,6 +11,9 @@ import Settings from "../pages/Dashboard/Settings";
 import Dashboardpage from "../pages/Dashboard/Dashboardpage";
 import Packages from "../pages/Dashboard/Packages";
 import UsersMangement from "../pages/Dashboard/UsersManagement";
+import LeaderManagement from "../pages/Dashboard/LeaderManagement";
+import Transaction from "../pages/Dashboard/Transaction";
+import Withdrawal from "../pages/Dashboard/Withdrawal";
 
 export default function AppRouter() {
   return (
@@ -31,7 +34,10 @@ export default function AppRouter() {
         {/* Example nested routes */}
          <Route index element={<Dashboardpage/>} />
         <Route path="users" element={<UsersMangement />} />
+        <Route path="leaders" element={<LeaderManagement />} />
         <Route path="package" element={<Packages />} />
+        <Route path="transactions" element={<Transaction />} />
+        <Route path="withdrawals" element={<Withdrawal />} />
         <Route path="settings" element={<Settings />} /> 
       </Route>
 
