@@ -1,11 +1,24 @@
 import { apiClient } from "./apiClient";
 
-export const getDashboardStats = async () => {
-  const res = await apiClient.get("/api/v1/admin/dashboard-stats");
-  return res.data;
+// ✅ Fetch Dashboard Overview
+export const getDashboardOverview = async () => {
+  try {
+    const res = await apiClient.get("/api/v1/admin/dashboard");
+    return res.data;
+  } catch (error) {
+    console.error("Fetching dashboard overview failed:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
-export const getRecentActivity = async () => {
-  const res = await apiClient.get("/api/v1/admin/recent-activity");
-  return res.data;
+// ✅ Fetch stats
+export const getStats = async () => {
+  try {
+    const res = await apiClient.get("/api/admin/stats/users");
+    return res.data;
+    console.log(res);
+  } catch (error) {
+    console.error("Fetching stats  failed:", error.response?.data || error.message);
+    throw error;
+  }
 };

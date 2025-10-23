@@ -1,16 +1,23 @@
 import { apiClient } from "./apiClient";
 
+// ✅ Get All Leaders
 export const getAllLeaders = async () => {
-  const res = await apiClient.get("/api/v1/admin/leaders");
-  return res.data;
+  try {
+    const res = await apiClient.get("/api/v1/admin/leaders");
+    return res.data;
+  } catch (error) {
+    console.error("Fetching leaders failed:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
-export const getLeaderById = async (id) => {
-  const res = await apiClient.get(`/api/v1/admin/leaders/${id}`);
-  return res.data;
-};
-
-export const updateLeader = async (id, data) => {
-  const res = await apiClient.put(`/api/v1/admin/leaders/${id}`, data);
-  return res.data;
+// ✅ Promote Leader
+export const promoteLeader = async (id) => {
+  try {
+    const res = await apiClient.post(`/api/v1/admin/leaders/${id}/promote`);
+    return res.data;
+  } catch (error) {
+    console.error("Promoting leader failed:", error.response?.data || error.message);
+    throw error;
+  }
 };

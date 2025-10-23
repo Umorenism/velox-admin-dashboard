@@ -1,16 +1,23 @@
 import { apiClient } from "./apiClient";
 
-export const getAllWithdrawals = async () => {
-  const res = await apiClient.get("/api/v1/admin/withdrawals");
-  return res.data;
+// ✅ Get All Withdrawals
+export const getWithdrawals = async () => {
+  try {
+    const res = await apiClient.get("/api/v1/admin/withdrawals");
+    return res.data;
+  } catch (error) {
+    console.error("Fetching withdrawals failed:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
+// ✅ Approve Withdrawal
 export const approveWithdrawal = async (id) => {
-  const res = await apiClient.put(`/api/v1/admin/withdrawals/${id}/approve`);
-  return res.data;
-};
-
-export const rejectWithdrawal = async (id, reason) => {
-  const res = await apiClient.put(`/api/v1/admin/withdrawals/${id}/reject`, { reason });
-  return res.data;
+  try {
+    const res = await apiClient.post(`/api/v1/admin/withdrawals/${id}/approve`);
+    return res.data;
+  } catch (error) {
+    console.error("Approving withdrawal failed:", error.response?.data || error.message);
+    throw error;
+  }
 };

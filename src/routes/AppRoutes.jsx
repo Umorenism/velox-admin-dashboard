@@ -33,9 +33,9 @@ export default function AppRouter() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+           <ProtectedRoute>
             <DashboardLayout />
-          </ProtectedRoute>
+           </ProtectedRoute>
         }
       >
         {/* Example nested routes */}

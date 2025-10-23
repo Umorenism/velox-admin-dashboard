@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const base_url = "https://ridecartserver.pinnaclebeacon.com/";
+const base_url = "https://velox-n3kv.onrender.com";
+
 
 // ✅ Create a base Axios instance
 export const apiClient = axios.create({

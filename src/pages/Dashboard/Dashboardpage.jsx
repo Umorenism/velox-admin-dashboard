@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { RiMenuFoldLine } from "react-icons/ri";
 import { DollarSign } from "lucide-react";
@@ -7,14 +7,55 @@ import DonutChart from "../../utlis/DonutChart";
 import DonutCharts from "../../utlis/DountCharts";
 import DepositProgressChart from "../../utlis/DepositProgressChart";
 import Banner from "../../utlis/Banner";
-
+// import { apiClient } from "../../api/apiClient";
 export default function Dashboardpage() {
-  const data = [
-    { title: "Total Deposit", amount: "0.00", currency: "USD" },
+  const [stats, setStats] = useState({
+    totalLeaders: 0,
+    totalActiveUsers: 0,
+  });
+  const [loading, setLoading] = useState(true);
+   const data = [
+     { title: "Total Deposit", amount: "0.00", currency: "USD" },
     { title: "Total Free Packages", amount: "0.00", currency: "USD" },
-    { title: "Total Users on Activated Packages", amount: "76", currency: "" },
-    { title: "Total Leaders on Free Packages", amount: "76", currency: "" },
+     { title: "Total Users on Activated Packages", amount: "76", currency: "" },
+     { title: "Total Leaders on Free Packages", amount: "76", currency: "" },
   ];
+
+  // ✅ Fetch live stats
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const res = await apiClient.get("/api/admin/stats/users");
+  //       setStats(res.data);
+  //     } catch (error) {
+  //       console.error(
+  //         "Fetching stats failed:",
+  //         error.response?.data || error.message
+  //       );
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchStats();
+  // }, []);
+
+   // ✅ Build the dynamic data cards
+  // const data = [
+  //   { title: "Total Deposit", amount: "0.00", currency: "USD" },
+  //   { title: "Total Free Packages", amount: "0.00", currency: "USD" },
+  //   {
+  //     title: "Total Users on Activated Packages",
+  //     amount: loading ? "..." : stats.totalActiveUsers,
+  //     currency: "",
+  //   },
+  //   {
+  //     title: "Total Leaders on Free Packages",
+  //     amount: loading ? "..." : stats.totalLeaders,
+  //     currency: "",
+  //   },
+  // ];
+
 
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },

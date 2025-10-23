@@ -7,6 +7,15 @@ import pic from "../../assets/success.svg";
 import PackageGrid from "../../utlis/PackageGrid";
 
 export default function Package() {
+  // const [showModal, setShowModal] = useState(false);
+  // const [showSuccess, setShowSuccess] = useState(false);
+  // const [formData, setFormData] = useState({
+  //   name: "",
+  //   amount: "",
+  //   image: null,
+  // });
+
+
   const [showModal, setShowModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,6 +24,36 @@ export default function Package() {
     image: null,
   });
 
+  const [refreshKey, setRefreshKey] = useState(0); // 🔁 triggers reload
+
+  // const handleInputChange = (e) => {
+  //   const { name, value, files } = e.target;
+  //   if (name === "image") {
+  //     setFormData({ ...formData, image: files[0] });
+  //   } else {
+  //     setFormData({ ...formData, [name]: value });
+  //   }
+  // };
+
+  const handleSubmit = async () => {
+    try {
+      const payload = new FormData();
+      payload.append("name", formData.name);
+      payload.append("price", formData.amount);
+      payload.append("description", "Access to premium features");
+      payload.append("isFree", false);
+      if (formData.image) payload.append("image", formData.image);
+
+      await createPackage(payload);
+
+      setShowModal(false);
+      setShowSuccess(true);
+      setRefreshKey((prev) => prev + 1); // refresh package list
+    } catch (error) {
+      console.error("Package creation failed:", error);
+      alert("Failed to create package. Check console for details.");
+    }
+  };
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -29,11 +68,11 @@ export default function Package() {
     }
   };
 
-  const handleSubmit = () => {
-    console.log("New Package Created:", formData);
-    setShowModal(false);
-    setShowSuccess(true);
-  };
+  // const handleSubmit = () => {
+  //   console.log("New Package Created:", formData);
+  //   setShowModal(false);
+  //   setShowSuccess(true);
+  // };
 
   useEffect(() => {
     let timer;
@@ -70,7 +109,9 @@ export default function Package() {
 
         {/* Package Grid */}
         <div className="mt-10">
-          <PackageGrid />
+          {/* <PackageGrid /> */}
+
+          <PackageGrid refreshTrigger={refreshKey} />
         </div>
       </motion.div>
 

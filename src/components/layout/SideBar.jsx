@@ -9,7 +9,7 @@ import {
   CreditCard,
   ArrowDownCircle,
   Shield,
-  Settings,
+  
   LifeBuoy,
   LogOut,
   Search,
