@@ -111,7 +111,7 @@ export default function Package() {
         <div className="mt-10">
           {/* <PackageGrid /> */}
 
-          <PackageGrid refreshTrigger={refreshKey} />
+          <PackageGrid />
         </div>
       </motion.div>
 

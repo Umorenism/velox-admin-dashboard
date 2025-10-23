@@ -160,9 +160,9 @@ export default function SideBar({ closeSidebar }) {
       </div>
 
       {/* ---- Bottom Section ---- */}
-      <div className="space-y-4 mb-20">
+      <div className="space-y-4 mt-4 mb-20">
         {/* 🌙 Dark/Light Toggle (only visible on mobile) */}
-        <div className="flex justify-center md:hidden">
+        <div className="flex justify-start md:hidden">
           <button
             onClick={toggleTheme}
             className="relative flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-full transition duration-300"
