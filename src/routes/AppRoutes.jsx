@@ -21,6 +21,7 @@ import Permission from "../pages/Dashboard/Permission";
 import NotFound from "../pages/Dashboard/NotFound";
 import CreateRole from "../pages/Dashboard/CreateRole";
 import EmailPage from "../pages/Dashboard/EmailPage";
+import BannersPage from "../pages/Dashboard/BannersPage";
 
 export default function AppRouter() {
   return (
@@ -46,6 +47,7 @@ export default function AppRouter() {
         <Route path="transactions" element={<Transaction />} />
         <Route path="withdrawals" element={<Withdrawal />} />
         <Route path="promotions" element={<PromotionsBanner />} />
+        <Route path="/dashboard/promotions/banners" element={<BannersPage />} />
         <Route path="settings" element={<Settings />} /> 
         <Route path="companyprofile" element={<CompanyProfile/>} /> 
         <Route path="notifications-route" element={<Notification/>} /> 
