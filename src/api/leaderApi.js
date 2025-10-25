@@ -36,3 +36,20 @@ export const getleaderAllUsers = async () => {
     throw error;
   }
 };
+
+
+// ✅ Send bulk email
+export const sendBulkEmail = async (payload) => {
+  if (!payload.subject || !payload.message) {
+    throw new Error("Subject and message body are required");
+  }
+
+  try {
+    const res = await apiClient.post("/api/admin/email/bulk", payload);
+    console.log("✅ Bulk Email Response:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("❌ Error sending bulk email:", error.response?.data || error);
+    throw error;
+  }
+};
