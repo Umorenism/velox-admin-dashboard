@@ -1,160 +1,122 @@
-import React from "react";
 
-const transactions = [
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-   status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-  {
-    id: "TXN-000124",
-    type: "Deposit",
-    username: "John Doe",
-    package: "Gold Plan",
-    amount: "$500",
-    method: "USDT",
-    status: "Approved",
-  },
-];
+import React, { useState, useMemo } from "react";
 
-const WithdrawalTable = () => {
+const WithdrawalTable = ({ withdrawals, searchTerm, filter }) => {
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // ✅ Filtering + Search
+  const filteredData = useMemo(() => {
+    return withdrawals.filter((tx) => {
+      const matchSearch =
+        tx.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tx._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tx.amount.toString().includes(searchTerm);
+
+      const matchFilter = filter === "All" ? true : tx.status === filter;
+      return matchSearch && matchFilter;
+    });
+  }, [withdrawals, searchTerm, filter]);
+
+  // ✅ Pagination
+  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * entriesPerPage,
+    currentPage * entriesPerPage
+  );
+
   return (
-    <div className="p-5 bg-white dark:bg-neutral-800 min-h-auto dark:text-white rounded-xl shadow-md">
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex dark:text-white items-center gap-2 text-sm text-gray-700">
-          <span>Showing</span>
+    <div className="p-5 bg-white dark:bg-neutral-800 dark:text-white rounded-xl shadow-md">
+      {/* Entries Selector */}
+      <div className="flex justify-between items-center mb-3 text-sm text-gray-700 dark:text-gray-300">
+        <div className="flex items-center gap-2">
+          <span>Show</span>
           <select
-            className="border dark:text-white border-gray-300 rounded-md text-sm px-2 py-1"
-            defaultValue="10"
+            className="border dark:bg-neutral-800 dark:text-white border-gray-300 rounded-md text-sm px-2 py-1"
+            value={entriesPerPage}
+            onChange={(e) => {
+              setEntriesPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
           >
-            <option>10</option>
-            <option>25</option>
-            <option>50</option>
+            {[10, 25, 50].map((n) => (
+              <option key={n}>{n}</option>
+            ))}
           </select>
-          <span>Entries</span>
+          <span>entries</span>
         </div>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full mt-5 border border-gray-200 text-sm">
-          <thead className="bg-gray-50 dark:bg-neutral-800  dark:text-white text-gray-700">
+        <table className="min-w-full text-sm border border-gray-200">
+          <thead className="bg-gray-50 dark:bg-neutral-900 text-gray-700 dark:text-white">
             <tr>
-              {[
-                "Transaction ID",
-                "Date",
-                "Username",
-                "Package Name",
-                "Amount",
-                "Payment Method",
-                "Action",
-              ].map((heading) => (
-                <th
-                  key={heading}
-                  className="px-4 py-3 text-left font-medium border-b border-gray-200"
-                >
-                  <div className="flex items-center gap-1">
-                    {heading}
-                    <span className="text-gray-400 cursor-pointer">⇅</span>
-                  </div>
+              {["ID", "Name", "Amount", "Status", "Created At"].map((heading) => (
+                <th key={heading} className="px-4 py-3 text-left font-medium border-b">
+                  {heading}
                 </th>
               ))}
             </tr>
           </thead>
 
-          <tbody className="text-gray-700">
-            {transactions.map((tx, index) => (
-              <tr
-                key={index}
-                className="border-b hover:bg-gray-50 transition-colors dark:text-white"
-              >
-                <td className="px-4 py-3">{tx.id}</td>
-                <td className="px-4 py-3">{tx.type}</td>
-                <td className="px-4 py-3">{tx.username}</td>
-                <td className="px-4 py-3">{tx.package}</td>
-                <td className="px-4 py-3">{tx.amount}</td>
-                <td className="px-4 py-3">{tx.method}</td>
-                <td className="px-4 py-3">
-                  <span className="bg-emerald-500 text-white text-xs px-3 py-1 rounded-full">
-                    {tx.status}
-                  </span>
+          <tbody>
+            {paginatedData.length > 0 ? (
+              paginatedData.map((tx) => (
+                <tr key={tx._id} className="border-b hover:bg-gray-50 dark:hover:bg-neutral-700">
+                  <td className="px-4 py-3">{tx._id}</td>
+                  <td className="px-4 py-3">{tx.userId?.name}</td>
+                  <td className="px-4 py-3">${tx.amount.toFixed(2)}</td>
+                  <td className="px-4 py-3 capitalize">
+                    <span
+                      className={`px-3 py-1 text-xs rounded-full ${
+                        tx.status === "pending"
+                          ? "bg-yellow-500 text-white"
+                          : tx.status === "approved" || tx.status === "confirmed"
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
+                    >
+                      {tx.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">{new Date(tx.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-4 text-gray-500 dark:text-gray-400">
+                  No withdrawals found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4 text-sm text-gray-600 dark:text-white">
-        <div className="mt-5">
-          Page <span className="font-semibold">1</span> of{" "}
-          <span className="font-semibold">1</span>
+        <div>
+          Page <span className="font-semibold">{currentPage}</span> of{" "}
+          <span className="font-semibold">{totalPages || 1}</span>
         </div>
 
-        <div className="flex mt-5 items-center gap-3">
-          <button className="text-gray-400 hover:text-gray-700">Previous</button>
-          <button className="bg-orange-500 text-white px-2 py-1 rounded-full">
-            1
+        <div className="flex items-center gap-3">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            className={`px-3 py-1 rounded ${currentPage === 1 ? "text-gray-400" : "text-blue-500 hover:text-blue-700"}`}
+          >
+            Previous
           </button>
-          <button className="text-gray-400 hover:text-gray-700">Next</button>
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            className={`px-3 py-1 rounded ${currentPage === totalPages ? "text-gray-400" : "text-blue-500 hover:text-blue-700"}`}
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
