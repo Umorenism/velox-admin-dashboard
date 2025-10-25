@@ -1,11 +1,6 @@
 
-
-
-
-
-
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState, useMemo } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -39,9 +34,13 @@ import { useTheme } from "../../context/ThemeContext";
 
 export default function SideBar({ closeSidebar }) {
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isPromotionOpen, setIsPromotionOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const toggleDropdown = (key) =>
     setOpenDropdown((prev) => (prev === key ? null : key));
@@ -58,13 +57,11 @@ export default function SideBar({ closeSidebar }) {
     { to: "/dashboard/withdrawals", label: "Withdrawals", icon: <ArrowDownCircle size={18} /> },
   ];
 
-  // === PROMOTIONS SECTION ===
   const promotionSubLinks = [
     { to: "/dashboard/promotions", label: "Promotions Overview", icon: <PlusSquare size={15} /> },
     { to: "/dashboard/promotions/banners", label: "Banners Created", icon: <ImageIcon size={15} /> },
   ];
 
-  // === NEW DROPDOWN GROUPS (from your updated sidebar) ===
   const dropdownLinks = [
     {
       key: "academy",
@@ -110,7 +107,6 @@ export default function SideBar({ closeSidebar }) {
     },
   ];
 
-  // === SINGLE PAGE LINKS ===
   const singleLinks = [
     { to: "/dashboard/reports", label: "Reports", icon: <BarChart3 size={18} /> },
     { to: "/dashboard/announcements", label: "Announcements", icon: <Megaphone size={18} /> },
@@ -119,7 +115,6 @@ export default function SideBar({ closeSidebar }) {
     { to: "/dashboard/downloads", label: "Downloads", icon: <Download size={18} /> },
   ];
 
-  // === SECURITY & SETTINGS ===
   const settingsSubLinks = [
     { to: "/dashboard/settings", label: "Active Log Page" },
     { to: "/dashboard/companyprofile", label: "Company Profile" },
@@ -131,18 +126,62 @@ export default function SideBar({ closeSidebar }) {
     { to: "/dashboard/support", label: "Support", icon: <LifeBuoy size={18} /> },
   ];
 
+  // ✅ Flatten all links into one searchable list
+  const allLinks = useMemo(() => {
+    const flattenLinks = (arr) =>
+      arr.flatMap((item) =>
+        item.links
+          ? item.links.map((sub) => ({ ...sub }))
+          : item
+      );
+
+    return [
+      ...topLinks,
+      ...promotionSubLinks,
+      ...flattenLinks(dropdownLinks),
+      ...singleLinks,
+      ...settingsSubLinks,
+      ...bottomLinks,
+    ];
+  }, []);
+
+  // ✅ Search handler
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchQuery(value);
+
+    if (value.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+
+    const results = allLinks.filter((link) =>
+      link.label.toLowerCase().includes(value)
+    );
+
+    setSearchResults(results);
+  };
+
+  // ✅ Navigate on click
+  const handleNavigate = (path) => {
+    navigate(path);
+    closeSidebar();
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
   return (
     <motion.aside
       initial={{ x: -300 }}
       animate={{ x: 0 }}
       exit={{ x: -300 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="w-72 bg-white min-h-screen dark:bg-neutral-900 dark:text-white shadow-md h-screen p-4 flex flex-col justify-between"
+      className="w-72 bg-white min-h-screen dark:bg-neutral-900 dark:text-white shadow-md flex flex-col"
     >
-      {/* ---- TOP SECTION ---- */}
-      <div>
+      {/* === FIXED HEADER (Logo + Search) === */}
+      <div className="sticky top-0 z-20 bg-white dark:bg-neutral-900 pb-3 border-b border-gray-200 dark:border-gray-800">
         {/* Mobile Close Button */}
-        <div className="flex justify-between items-center mb-4 md:hidden">
+        <div className="flex justify-between items-center mb-3 md:hidden px-4 pt-3">
           <img src={logoimg} alt="Velox Logo" className="w-20 object-contain" />
           <button
             onClick={closeSidebar}
@@ -153,23 +192,43 @@ export default function SideBar({ closeSidebar }) {
         </div>
 
         {/* Desktop Logo */}
-        <div className="hidden md:flex justify-start mb-6">
+        <div className="hidden md:flex justify-start px-4 mb-4 pt-3">
           <img src={logoimg} alt="Velox Logo" className="w-20 object-contain" />
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+        {/* ✅ Search Bar */}
+        <div className="relative px-4">
+          <Search className="absolute left-7 top-2.5 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="Search..."
-            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-700 
-            dark:border-white border dark:text-white rounded-[6px] pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00A991]"
+            placeholder="Search pages..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="w-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white rounded-md pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00A991]"
           />
-        </div>
 
-        {/* === TOP LINKS === */}
+          {/* 🔽 Search Results Dropdown */}
+          {searchResults.length > 0 && (
+            <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-neutral-800 shadow-lg rounded-md max-h-60 overflow-y-auto z-30 border border-gray-200 dark:border-gray-700">
+              {searchResults.map((result) => (
+                <button
+                  key={result.to}
+                  onClick={() => handleNavigate(result.to)}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-[#FFECE5] dark:hover:bg-gray-700 transition"
+                >
+                  {result.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* === SCROLLABLE CONTENT === */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+        {/* === NAVIGATION === */}
         <nav className="space-y-3">
+          {/* === TOP LINKS === */}
           {topLinks.map((link) => (
             <NavLink
               key={link.to}
@@ -188,7 +247,7 @@ export default function SideBar({ closeSidebar }) {
             </NavLink>
           ))}
 
-          {/* === Promotions & Banners === */}
+          {/* === Promotions === */}
           <div>
             <button
               onClick={togglePromotion}
@@ -232,7 +291,7 @@ export default function SideBar({ closeSidebar }) {
             </AnimatePresence>
           </div>
 
-          {/* === NEW DROPDOWN GROUPS === */}
+          {/* === DROPDOWNS === */}
           {dropdownLinks.map((group) => (
             <div key={group.key}>
               <button
@@ -243,11 +302,7 @@ export default function SideBar({ closeSidebar }) {
                   {group.icon}
                   <span>{group.label}</span>
                 </div>
-                {openDropdown === group.key ? (
-                  <ChevronUp size={16} />
-                ) : (
-                  <ChevronDown size={16} />
-                )}
+                {openDropdown === group.key ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </button>
 
               <AnimatePresence>
@@ -344,12 +399,10 @@ export default function SideBar({ closeSidebar }) {
           </div>
         </nav>
 
-        <hr className="mt-10 border-gray-200 dark:border-gray-700" />
-      </div>
+        {/* === BOTTOM SECTION === */}
+        <hr className="mt-6 border-gray-200 dark:border-gray-700" />
 
-      {/* ---- BOTTOM SECTION ---- */}
-      <div className="space-y-4 mt-4 mb-20">
-        <div className="space-y-2">
+        <div className="space-y-4 mt-2 mb-4">
           {bottomLinks.map((link) => (
             <NavLink
               key={link.to}
@@ -367,29 +420,29 @@ export default function SideBar({ closeSidebar }) {
               {link.label}
             </NavLink>
           ))}
-        </div>
 
-        {/* Profile Section */}
-        <div className="flex items-center justify-between dark:bg-gray-800 rounded-lg p-3">
-          <div className="flex items-center gap-3 relative">
-            <img
-              src={profilePic}
-              alt="Admin"
-              className="w-20 h-20 rounded-full object-cover border border-gray-300 dark:border-gray-700"
-            />
-            <div>
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                Alison Eyo
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                admin@alison.com
-              </p>
+          {/* === PROFILE SECTION === */}
+          <div className="flex items-center justify-between dark:bg-gray-800 rounded-lg p-3">
+            <div className="flex items-center gap-3 relative">
+              <img
+                src={profilePic}
+                alt="Admin"
+                className="w-20 h-20 rounded-full object-cover border border-gray-300 dark:border-gray-700"
+              />
+              <div>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  Alison Eyo
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  admin@alison.com
+                </p>
+              </div>
             </div>
-          </div>
 
-          <button className="text-gray-500 hover:text-red-500 transition">
-            <LogOut size={18} />
-          </button>
+            <button className="text-gray-500 hover:text-red-500 transition">
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </motion.aside>
