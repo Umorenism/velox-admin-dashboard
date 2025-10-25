@@ -22,3 +22,4 @@ export const activateUserPackage = async (userId) => {
 export const fundUserPackage = async (userId, data) => {
   return await apiClient.post(`/api/admin/users/fund`, { userId, ...data });
 };
+

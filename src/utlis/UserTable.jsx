@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { activateUserPackage, fundUserPackage } from "../../api/userApi";
+import { activateUserPackage, fundUserPackage } from "../api/userApi";
 import { Loader2 } from "lucide-react";
 
 const UserTable = ({
