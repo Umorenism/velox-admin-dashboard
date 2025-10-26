@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { activateUserPackage, fundUserPackage } from "../api/userApi";
@@ -21,9 +19,14 @@ const UserTable = ({
   const [actionLoading, setActionLoading] = useState(false);
   const [fundPackage, setFundPackage] = useState("");
 
-  // ✅ Filter users
+  // Filter users with case-insensitive role comparison
   const filteredUsers = useMemo(() => {
-    if (!users) return [];
+    if (!users || !Array.isArray(users)) return [];
+
+    // Debug: Log unique roles to check backend data
+    const uniqueRoles = [...new Set(users.map((u) => u.role).filter(Boolean))];
+    console.log("Unique Roles:", uniqueRoles);
+
     return users.filter((u) => {
       const q = searchTerm.toLowerCase();
       const match =
@@ -32,11 +35,16 @@ const UserTable = ({
         u.phone?.toLowerCase().includes(q) ||
         u.prefix?.toLowerCase().includes(q) ||
         u.role?.toLowerCase().includes(q);
-      return match && (filter === "All" || u.role === filter);
+
+      // Case-insensitive role filter
+      const roleMatch =
+        filter === "All" ||
+        (u.role && u.role.toLowerCase() === filter.toLowerCase());
+      return match && roleMatch;
     });
   }, [users, searchTerm, filter]);
 
-  // ✅ Pagination
+  // Pagination
   const totalPages = Math.ceil(filteredUsers.length / entriesPerPage);
   const paginatedUsers = filteredUsers.slice(
     (currentPage - 1) * entriesPerPage,
@@ -56,7 +64,7 @@ const UserTable = ({
     setFundPackage("");
   };
 
-  // ✅ Activate User Package
+  // Activate User Package
   const handleActivate = async () => {
     try {
       setActionLoading(true);
@@ -65,14 +73,13 @@ const UserTable = ({
       handleCloseModal();
       onRefresh();
     } catch (err) {
-      console.error("❌ Activation failed:", err);
-      alert("Failed to activate package.");
+      alert("Failed to activate package: " + err.message);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // ✅ Fund User Package
+  // Fund User Package
   const handleFund = async () => {
     if (!fundPackage) return alert("Please select a package type!");
     try {
@@ -82,8 +89,7 @@ const UserTable = ({
       handleCloseModal();
       onRefresh();
     } catch (err) {
-      console.error("❌ Funding failed:", err);
-      alert("Failed to fund package.");
+      alert("Failed to fund package: " + err.message);
     } finally {
       setActionLoading(false);
     }
@@ -110,11 +116,11 @@ const UserTable = ({
             paginatedUsers.map((u, i) => (
               <tr key={u._id} className="border-b hover:bg-gray-50 dark:hover:bg-neutral-700">
                 <td className="px-4 py-3">{(currentPage - 1) * entriesPerPage + i + 1}</td>
-                <td className="px-4 py-3">{u.name}</td>
-                <td className="px-4 py-3">{u.email}</td>
-                <td className="px-4 py-3">{u.phone}</td>
-                <td className="px-4 py-3">{u.prefix}</td>
-                <td className="px-4 py-3 capitalize">{u.role}</td>
+                <td className="px-4 py-3">{u.name || "N/A"}</td>
+                <td className="px-4 py-3">{u.email || "N/A"}</td>
+                <td className="px-4 py-3">{u.phone || "N/A"}</td>
+                <td className="px-4 py-3">{u.prefix || "N/A"}</td>
+                <td className="px-4 py-3 capitalize">{u.role || "N/A"}</td>
                 <td className="px-4 py-3 flex gap-2">
                   <button
                     onClick={() => handleOpenModal(u, "activate")}
@@ -132,7 +138,11 @@ const UserTable = ({
               </tr>
             ))
           ) : (
-            <tr><td colSpan="7" className="text-center py-6">No users found.</td></tr>
+            <tr>
+              <td colSpan="7" className="text-center py-6">
+                {filter === "All" ? "No users found." : `No ${filter.toLowerCase()}s found.`}
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
@@ -227,5 +237,3 @@ const UserTable = ({
 };
 
 export default UserTable;
-
-

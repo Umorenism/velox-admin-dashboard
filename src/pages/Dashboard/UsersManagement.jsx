@@ -88,29 +88,27 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Filter } from "lucide-react";
-import { getUsers } from "../../api/userApi"; // ← your users endpoint
+import { getUsers } from "../../api/userApi";
 import UserTable from "../../utlis/UserTable";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 8;
 
-  // ✅ Fetch Users
+  // Fetch Users
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await getUsers();
-
-      // ✅ Handles both array and object responses
-      const data = Array.isArray(res) ? res : res?.users || [];
-      console.log("Fetched Users:", data); // Debug log
+      setError("");
+      const data = await getUsers();
       setUsers(data);
     } catch (err) {
-      console.error("❌ Failed to fetch users:", err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -128,7 +126,12 @@ export default function UserManagement() {
     >
       <h1 className="text-2xl font-bold mb-6">User Management</h1>
 
-      {/* 🔍 Search + Filter */}
+      {/* Error Message */}
+      {error && (
+        <p className="text-red-500 mb-4 bg-red-100 dark:bg-red-900 p-2 rounded">{error}</p>
+      )}
+
+      {/* Search + Filter */}
       <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
         <div className="flex items-center bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg px-3 py-2 w-full sm:w-1/3">
           <Search size={16} className="text-gray-500 mr-2" />
@@ -152,7 +155,7 @@ export default function UserManagement() {
         </select>
       </div>
 
-      {/* 🧾 User Table */}
+      {/* User Table */}
       <UserTable
         users={users}
         loading={loading}

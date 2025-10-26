@@ -159,10 +159,10 @@ export default function LeaderManagement() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <div className="flex dark:bg-neutral-800 dark:text-white flex-wrap gap-2 w-full sm:w-auto">
             <select
               onChange={(e) => handleFilter("rank", e.target.value)}
-              className="border dark:text-white border-gray-300 rounded-md text-sm px-3 py-2"
+              className="border dark:bg-neutral-800  dark:text-white border-gray-300 rounded-md text-sm px-3 py-2"
             >
               <option value="all">All Ranks</option>
               <option value="Gold">Gold</option>
@@ -172,7 +172,7 @@ export default function LeaderManagement() {
             </select>
             <select
               onChange={(e) => handleFilter("role", e.target.value)}
-              className="border dark:text-white border-gray-300 rounded-md text-sm px-3 py-2"
+              className="border dark:bg-neutral-800  dark:text-white border-gray-300 rounded-md text-sm px-3 py-2"
             >
               <option value="all">All Roles</option>
               <option value="user">User</option>
