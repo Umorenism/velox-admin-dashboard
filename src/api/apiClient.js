@@ -1,17 +1,12 @@
 import axios from "axios";
 
-const base_url = "https://velox-n3kv.onrender.com";
+const base_url = "https://velox-n3kv.onrender.com"; // ✅ your backend
 
-
-// ✅ Create a base Axios instance
 export const apiClient = axios.create({
   baseURL: base_url,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
-// ✅ Automatically attach token if available
+// ✅ Attach token dynamically
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
@@ -19,10 +14,13 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // ❌ Only add JSON header when NOT uploading files
-    if (!(config.data instanceof FormData)) {
+    // 🧠 Let Axios handle Content-Type automatically for FormData
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    } else {
       config.headers["Content-Type"] = "application/json";
     }
+
     return config;
   },
   (error) => Promise.reject(error)
