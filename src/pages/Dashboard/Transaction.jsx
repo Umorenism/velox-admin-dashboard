@@ -281,7 +281,7 @@ export default function Transaction() {
     >
       <motion.div
         variants={fadeUp}
-        className="w-full max-w-[1500px] mt-6 dark:bg-neutral-900"
+        className="w-full max-w-[1500px]  dark:bg-neutral-900"
       >
         {/* Header */}
         <div className="space-y-5">

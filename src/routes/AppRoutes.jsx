@@ -50,6 +50,7 @@ import LiveMentorship from "../pages/academy/LiveMentorship";
 import Unilevel from "../pages/network/Unilevel";
 import Matrix from "../pages/network/Matrix";
 import Ranks from "../pages/network/Ranks";
+import Wallet from "../pages/wallet/Wallet";
 
 export default function AppRouter() {
   return (
@@ -73,6 +74,7 @@ export default function AppRouter() {
         <Route path="package" element={<Packages />} />
         <Route path="transactions" element={<Transaction />} />
         <Route path="withdrawals" element={<Withdrawal />} />
+        <Route path="wallet-fund" element={<Wallet/>} />
         <Route path="promotions" element={<PromotionsBanner />} />
         <Route path="promotions/banners" element={<BannersPage />} />
         <Route path="settings" element={<Settings />} />

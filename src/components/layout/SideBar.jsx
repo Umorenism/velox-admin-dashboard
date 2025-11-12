@@ -54,6 +54,7 @@ export default function SideBar({ closeSidebar }) {
     { to: "/dashboard/leaders", label: "Leader Management", icon: <Crown size={18} /> },
     { to: "/dashboard/package", label: "Package & Wallet Activity", icon: <Wallet size={18} /> },
     { to: "/dashboard/transactions", label: "Transactions", icon: <CreditCard size={18} /> },
+    { to: "/dashboard/wallet-fund", label: "Wallet", icon: <CreditCard size={18} /> },
     { to: "/dashboard/withdrawals", label: "Withdrawals", icon: <ArrowDownCircle size={18} /> },
   ];
 

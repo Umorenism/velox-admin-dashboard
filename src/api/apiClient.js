@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const base_url = "https://velox-n3kv.onrender.com"; // ✅ your backend
+const base_url = "https://backend.veloxcapitalmarkets.ai"; // ✅ your backend
 
 export const apiClient = axios.create({
   baseURL: base_url,
