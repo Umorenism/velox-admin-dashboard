@@ -10,7 +10,7 @@ import { DollarSign, Search, Filter, Download } from "lucide-react";
 import { getTotalLeaders, getActiveLeaders, getleaderAllUsers } from "../../api/leaderApi";
 
 import * as XLSX from "xlsx"; // For CSV export
-import LeaderTable from "../../utlis/leaderTable";
+import LeaderTable from "../../utlis/LeaderTable";
 
 export default function LeaderManagement() {
   const [stats, setStats] = useState({
