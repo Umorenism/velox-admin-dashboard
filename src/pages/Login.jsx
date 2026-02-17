@@ -214,14 +214,14 @@ export default function Login() {
             </button>
 
             {/* Forgot Password */}
-            <div className="mt-4 text-center">
+            {/* <div className="mt-4 text-center">
               <Link
                 to="/forgot-password"
                 className="text-sm text-[#00A991] hover:underline"
               >
                 Forgot password?
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

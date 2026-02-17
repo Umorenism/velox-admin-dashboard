@@ -277,14 +277,14 @@ export default function Transaction() {
     <motion.div
       initial="hidden"
       animate="show"
-      className="flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 dark:text-white min-h-screen px-4 sm:px-6 lg:px-8"
+      className="flex flex-col mt-10 items-center  bg-gray-100 dark:bg-neutral-900 dark:text-white min-h-screen px-4 sm:px-6 lg:px-8"
     >
       <motion.div
         variants={fadeUp}
         className="w-full max-w-[1500px]  dark:bg-neutral-900"
       >
         {/* Header */}
-        <div className="space-y-5">
+        <div className="space-y-3">
           <RiMenuFoldLine size={30} className="text-gray-700 dark:text-white" />
           <h1 className="text-[20px] sm:text-[24px] font-[700] text-[#000000] dark:text-white">
             Transactions

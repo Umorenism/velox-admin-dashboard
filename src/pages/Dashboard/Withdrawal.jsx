@@ -91,7 +91,7 @@ export default function Withdrawal() {
     <motion.div
       initial="hidden"
       animate="show"
-      className="flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 dark:text-white min-h-screen px-4 sm:px-6 lg:px-8"
+      className="flex flex-col items-center mt-10 bg-gray-100 dark:bg-neutral-900 dark:text-white min-h-screen px-4 sm:px-6 lg:px-8"
     >
       <motion.div variants={fadeUp} className="w-full max-w-[1500px] mt-6">
         {/* Header */}
