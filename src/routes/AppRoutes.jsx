@@ -21,6 +21,7 @@ import NotFound from "../pages/Dashboard/NotFound";
 import CreateRole from "../pages/Dashboard/CreateRole";
 import EmailPage from "../pages/Dashboard/EmailPage";
 import BannersPage from "../pages/Dashboard/BannersPage";
+import AdminUploadCourse from "../pages/Dashboard/AdminUploadCourse";
 
 // 💰 Monthly
 import IncomeCalculator from "../pages/monthly/IncomeCalculator";
@@ -39,6 +40,7 @@ import RetirementBlock from "../pages/retirement/RetirementBlock";
 import SocialLinks from "../pages/sociallink/SocialLinks";
 import Downloads from "../pages/download/Downloads";
 
+
 // 🎓 Academy
 import MasterclassBasic from "../pages/academy/MasterclassBasic";
 import MasterclassPro from "../pages/academy/MasterclassPro";
@@ -55,67 +57,65 @@ import Wallet from "../pages/wallet/Wallet";
 export default function AppRouter() {
   return (
     <Routes>
-      {/* Redirect root */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<Login />} />
+  <Route path="/" element={<Navigate to="/login" replace />} />
+  <Route path="/login" element={<Login />} />
 
-      {/* Dashboard Routes */}
-      <Route
-        path="/dashboard"
-        element={
-           <ProtectedRoute>
-            <DashboardLayout />
-           </ProtectedRoute>
-        }
-      >
-        <Route index element={<Dashboardpage />} />
-        <Route path="users" element={<UsersMangement />} />
-        <Route path="leaders" element={<LeaderManagement />} />
-        <Route path="package" element={<Packages />} />
-        <Route path="transactions" element={<Transaction />} />
-        <Route path="withdrawals" element={<Withdrawal />} />
-        <Route path="wallet-fund" element={<Wallet/>} />
-        <Route path="promotions" element={<PromotionsBanner />} />
-        <Route path="promotions/banners" element={<BannersPage />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="companyprofile" element={<CompanyProfile />} />
-        <Route path="notifications-route" element={<Notification />} />
-        <Route path="permission" element={<Permission />} />
-        <Route path="create" element={<CreateRole />} />
-        <Route path="email" element={<EmailPage />} />
+  {/* All protected routes live under one guarded layout route */}
+  <Route element={<ProtectedRoute />}>
+    <Route path="/dashboard" element={<DashboardLayout />}>
+      <Route index element={<Dashboardpage />} />
+      <Route path="users" element={<UsersMangement />} />
+      <Route path="leaders" element={<LeaderManagement />} />
+      <Route path="package" element={<Packages />} />
+      <Route path="transactions" element={<Transaction />} />
+      <Route path="withdrawals" element={<Withdrawal />} />
+      <Route path="wallet-fund" element={<Wallet />} />
+      <Route path="promotions" element={<PromotionsBanner />} />
+      <Route path="promotions/banners" element={<BannersPage />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="companyprofile" element={<CompanyProfile />} />
+      <Route path="notifications-route" element={<Notification />} />
+      <Route path="permission" element={<Permission />} />
+      <Route path="create" element={<CreateRole />} />
+      <Route path="courses" element={<AdminUploadCourse />} />
+      <Route path="email" element={<EmailPage />} />
 
-        {/* 💰 Monthly */}
-        <Route path="monthly/income-calculator" element={<IncomeCalculator />} />
-        <Route path="monthly/compound" element={<CompoundCalculator />} />
-        <Route path="monthly/relation-boards" element={<RelationBoard />} />
+      {/* Monthly */}
+      <Route path="monthly/income-calculator" element={<IncomeCalculator />} />
+      <Route path="monthly/compound" element={<CompoundCalculator />} />
+      <Route path="monthly/relation-boards" element={<RelationBoard />} />
 
-        {/* 🌐 Network */}
-        <Route path="network/unilevel" element={<Unilevel />} />
-        <Route path="network/matrix" element={<Matrix />} />
-        <Route path="network/ranks" element={<Ranks />} />
+      {/* Network */}
+      <Route path="network/unilevel" element={<Unilevel />} />
+      <Route path="network/matrix" element={<Matrix />} />
+      <Route path="network/ranks" element={<Ranks />} />
 
-        {/* 📊 Copy Trading */}
-        <Route path="copytrading/low-risk" element={<LowRisk />} />
-        <Route path="copytrading/medium-risk" element={<MediumRisk />} />
-        <Route path="copytrading/high-risk" element={<HighRisk />} />
+      {/* Copy Trading */}
+      <Route path="copytrading/low-risk" element={<LowRisk />} />
+      <Route path="copytrading/medium-risk" element={<MediumRisk />} />
+      <Route path="copytrading/high-risk" element={<HighRisk />} />
 
-        {/* 🎓 Academy */}
-        <Route path="academy/masterclass/basic" element={<MasterclassBasic />} />
-        <Route path="academy/masterclass/pro" element={<MasterclassPro />} />
-        <Route path="academy/masterclass/advance" element={<MasterclassAdvance />} />
-        <Route path="academy/market-review" element={<MarketReview />} />
-        <Route path="academy/live-mentorship" element={<LiveMentorship />} />
+      {/* Academy */}
+      <Route path="academy/masterclass/basic" element={<MasterclassBasic />} />
+      <Route path="academy/masterclass/pro" element={<MasterclassPro />} />
+      <Route path="academy/masterclass/advance" element={<MasterclassAdvance />} />
+      <Route path="academy/market-review" element={<MarketReview />} />
+      <Route path="academy/live-mentorship" element={<LiveMentorship />} />
 
-        {/* 🧾 Others */}
-        <Route path="reports" element={<Reports />} />
-        <Route path="announcements" element={<Announcements />} />
-        <Route path="retirement-bloq" element={<RetirementBlock />} />
-        <Route path="qr" element={<SocialLinks />} />
-        <Route path="downloads" element={<Downloads />} />
-      </Route>
+      {/* Others */}
+      <Route path="reports" element={<Reports />} />
+      <Route path="announcements" element={<Announcements />} />
+      <Route path="retirement-bloq" element={<RetirementBlock />} />
+      <Route path="qr" element={<SocialLinks />} />
+      <Route path="downloads" element={<Downloads />} />
 
-      {/* 404 */}
+      {/* Optional: catch-all inside dashboard */}
       <Route path="*" element={<NotFound />} />
-    </Routes>
+    </Route>
+  </Route>
+
+  {/* Global 404 – only reached if nothing else matches */}
+  <Route path="*" element={<NotFound />} />
+</Routes>
   );
 }
