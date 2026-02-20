@@ -14,21 +14,19 @@ const UserTable = ({
   onRefresh,
 }) => {
   const [openModal, setOpenModal] = useState(false);
-  const [modalType, setModalType] = useState("");
+  const [modalType, setModalType] = useState(""); // "activate" or "fund"
   const [selectedUser, setSelectedUser] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [fundPackage, setFundPackage] = useState("");
+  
+  // For FUND modal only
+  const [fundAmount, setFundAmount] = useState("");
 
-  // Filter users with case-insensitive role comparison
+  // Filter users
   const filteredUsers = useMemo(() => {
     if (!users || !Array.isArray(users)) return [];
 
-    // Debug: Log unique roles to check backend data
-    const uniqueRoles = [...new Set(users.map((u) => u.role).filter(Boolean))];
-    console.log("Unique Roles:", uniqueRoles);
-
+    const q = searchTerm.toLowerCase();
     return users.filter((u) => {
-      const q = searchTerm.toLowerCase();
       const match =
         u.name?.toLowerCase().includes(q) ||
         u.email?.toLowerCase().includes(q) ||
@@ -36,10 +34,10 @@ const UserTable = ({
         u.prefix?.toLowerCase().includes(q) ||
         u.role?.toLowerCase().includes(q);
 
-      // Case-insensitive role filter
       const roleMatch =
         filter === "All" ||
         (u.role && u.role.toLowerCase() === filter.toLowerCase());
+
       return match && roleMatch;
     });
   }, [users, searchTerm, filter]);
@@ -54,6 +52,7 @@ const UserTable = ({
   const handleOpenModal = (user, type) => {
     setSelectedUser(user);
     setModalType(type);
+    setFundAmount(""); // reset amount
     setOpenModal(true);
   };
 
@@ -61,11 +60,12 @@ const UserTable = ({
     setOpenModal(false);
     setSelectedUser(null);
     setModalType("");
-    setFundPackage("");
+    setFundAmount("");
   };
 
-  // Activate User Package
+  // Activate Package
   const handleActivate = async () => {
+    if (!selectedUser?._id) return;
     try {
       setActionLoading(true);
       await activateUserPackage(selectedUser._id);
@@ -73,23 +73,27 @@ const UserTable = ({
       handleCloseModal();
       onRefresh();
     } catch (err) {
-      alert("Failed to activate package: " + err.message);
+      alert("Failed to activate package: " + (err.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
   };
 
-  // Fund User Package
+  // Fund User (amount only)
   const handleFund = async () => {
-    if (!fundPackage) return alert("Please select a package type!");
+    if (!selectedUser?._id) return alert("No user selected");
+    if (!fundAmount || isNaN(fundAmount) || Number(fundAmount) <= 0) {
+      return alert("Please enter a valid amount greater than 0");
+    }
+
     try {
       setActionLoading(true);
-      await fundUserPackage(selectedUser._id, { packageType: fundPackage });
-      alert("💰 Package funded successfully!");
+      await fundUserPackage(selectedUser._id, { amount: Number(fundAmount) });
+      alert(`💰 Successfully funded ${selectedUser.name} with $${fundAmount}`);
       handleCloseModal();
       onRefresh();
     } catch (err) {
-      alert("Failed to fund package: " + err.message);
+      alert("Failed to fund user: " + (err.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -149,7 +153,7 @@ const UserTable = ({
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4 text-sm text-gray-600 dark:text-gray-300">
-        <p>Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong></p>
+        <p>Page <strong>{currentPage}</strong> of <strong>{totalPages || 1}</strong></p>
         <div className="flex gap-3 items-center">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -171,7 +175,7 @@ const UserTable = ({
 
       {/* Modal */}
       <AnimatePresence>
-        {openModal && (
+        {openModal && selectedUser && (
           <motion.div
             className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
@@ -186,46 +190,77 @@ const UserTable = ({
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
             >
-              <button onClick={handleCloseModal} className="absolute top-3 right-4 text-gray-400 hover:text-red-500">✕</button>
+              <button
+                onClick={handleCloseModal}
+                className="absolute top-3 right-4 text-gray-400 hover:text-red-500 text-xl"
+              >
+                ✕
+              </button>
 
               {modalType === "activate" ? (
                 <>
-                  <h2 className="text-lg font-semibold mb-3">Activate Package</h2>
-                  <p>Are you sure you want to activate <strong>{selectedUser?.name}</strong>’s package?</p>
-                  <div className="flex gap-3 mt-5">
+                  <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                    Activate Package
+                  </h2>
+                  <p className="mb-6 text-gray-700 dark:text-gray-300">
+                    Are you sure you want to activate a package for{" "}
+                    <strong>{selectedUser.name || selectedUser.email}</strong>?
+                  </p>
+                  <div className="flex gap-4">
                     <button
                       onClick={handleActivate}
                       disabled={actionLoading}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg w-full flex justify-center"
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition"
                     >
-                      {actionLoading ? <Loader2 size={18} className="animate-spin" /> : "Activate"}
+                      {actionLoading ? <Loader2 size={18} className="animate-spin" /> : "Confirm Activate"}
                     </button>
-                    <button onClick={handleCloseModal} className="border border-gray-400 text-gray-600 px-4 py-2 rounded-lg w-full">
+                    <button
+                      onClick={handleCloseModal}
+                      className="flex-1 border border-gray-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-neutral-800 transition"
+                    >
                       Cancel
                     </button>
                   </div>
                 </>
               ) : (
                 <>
-                  <h2 className="text-lg font-semibold mb-3">Fund Package</h2>
-                  <select
-                    value={fundPackage}
-                    onChange={(e) => setFundPackage(e.target.value)}
-                    className="border w-full p-2 rounded-lg mb-5 dark:bg-neutral-800 dark:text-white"
-                  >
-                    <option value="">Select Package Type</option>
-                    <option value="Basic">Basic</option>
-                    <option value="Standard">Standard</option>
-                    <option value="Premium">Premium</option>
-                    <option value="Gold">Gold</option>
-                  </select>
-                  <button
-                    onClick={handleFund}
-                    disabled={actionLoading}
-                    className="bg-green-600 text-white w-full py-2 rounded-lg flex justify-center"
-                  >
-                    {actionLoading ? <Loader2 size={18} className="animate-spin" /> : "Fund Package"}
-                  </button>
+                  <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                    Fund User Account
+                  </h2>
+                  <p className="mb-4 text-gray-700 dark:text-gray-300">
+                    Enter amount to fund for <strong>{selectedUser.name || selectedUser.email}</strong>
+                  </p>
+
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Amount (USD)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={fundAmount}
+                      onChange={(e) => setFundAmount(e.target.value)}
+                      placeholder="e.g. 100.00"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={handleFund}
+                      disabled={actionLoading || !fundAmount || Number(fundAmount) <= 0}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition"
+                    >
+                      {actionLoading ? <Loader2 size={18} className="animate-spin" /> : "Confirm Funding"}
+                    </button>
+                    <button
+                      onClick={handleCloseModal}
+                      className="flex-1 border border-gray-300 dark:border-neutral-700 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-neutral-800 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </>
               )}
             </motion.div>
