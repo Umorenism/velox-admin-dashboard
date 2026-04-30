@@ -1,9 +1,7 @@
-
-
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { RiMenuFoldLine } from "react-icons/ri";
-import { Upload } from "lucide-react";
+import { Upload, X, Package as PackageIcon, CheckCircle2 } from "lucide-react";
 import pic from "../../assets/success.svg";
 import PackageGrid from "../../utlis/PackageGrid";
 import { apiClient } from "../../api/apiClient";
@@ -19,35 +17,16 @@ export default function Package() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const packageOptions = [
-    "Starter",
-    "Basic",
-    "Standard",
-    "Gold",
-    "Premium",
-    "Platinum",
-    "Diamond",
-  ];
+  const packageOptions = ["Starter", "Basic", "Standard", "Gold", "Premium", "Platinum", "Diamond"];
 
   // ✅ CREATE PACKAGE FUNCTION
   const createPackage = async (payload) => {
     try {
-      console.log("Sending payload to /api/admin/packages/create:");
-      for (let [key, value] of payload.entries()) {
-        console.log(key, value);
-      }
-
       const response = await apiClient.post("/api/admin/packages/create", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("API response:", response.data);
       return response.data;
     } catch (error) {
-      console.error("Package creation error:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
       throw new Error(error.response?.data?.message || error.message || "Unknown error");
     }
   };
@@ -67,7 +46,6 @@ export default function Package() {
           setErrorMessage("Image size must be less than 5MB.");
           return;
         }
-        console.log("Selected file:", file);
         setFormData({ ...formData, image: file });
       }
     } else {
@@ -83,15 +61,12 @@ export default function Package() {
         setErrorMessage("Please select a package name.");
         return;
       }
-
       if (!formData.amount && formData.name !== "Starter") {
         setErrorMessage("Please enter an amount for paid packages.");
         return;
       }
 
-      // ✅ Determine isFree based on name or amount
       const isFree = formData.amount === "0" || formData.name === "Starter";
-
       const payload = new FormData();
       payload.append("name", formData.name);
       payload.append("price", isFree ? 0 : formData.amount);
@@ -111,7 +86,6 @@ export default function Package() {
     }
   };
 
-  // ✅ SUCCESS MODAL AUTO CLOSE
   useEffect(() => {
     let timer;
     if (showSuccess) {
@@ -120,180 +94,159 @@ export default function Package() {
     return () => clearTimeout(timer);
   }, [showSuccess]);
 
-  const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
   return (
     <motion.div
-      initial="hidden"
-      animate="show"
-      className="flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 dark:text-white mt-10 px-4 sm:px-6 lg:px-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="p-4 sm:p-8 max-w-[1600px] mx-auto min-h-screen bg-gray-50 dark:bg-[#020617] transition-colors duration-300"
     >
-      <motion.div variants={fadeUp} className="w-full max-w-[1500px]">
-        {/* HEADER */}
-        <div className="space-y-5">
-          <RiMenuFoldLine size={30} className="text-gray-700 dark:text-white" />
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <h1 className="text-[20px] sm:text-[24px] font-[700] text-[#000000] dark:text-white">
-              Packages and Wallet Activity
-            </h1>
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-[#00A991] text-white px-6 sm:px-10 py-3 rounded-[10px] text-sm sm:text-base hover:bg-[#00957F] transition"
-            >
-              Create New Package
-            </button>
+      {/* HEADER SECTION */}
+      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Packages</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Manage investment tiers and platform access</p>
           </div>
         </div>
 
-        {/* PACKAGE GRID */}
-        <div className="mt-10">
-          <PackageGrid refreshKey={refreshKey} />
-        </div>
-      </motion.div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center justify-center gap-2 px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
+        >
+          <PackageIcon size={18} />
+          <span>Create New Package</span>
+        </button>
+      </div>
+
+      {/* PACKAGE GRID AREA */}
+      <div className="bg-white/50 dark:bg-slate-900/40 rounded-[2.5rem] p-1 sm:p-4 border border-slate-200 dark:border-white/5">
+        <PackageGrid refreshKey={refreshKey} />
+      </div>
 
       {/* CREATE PACKAGE MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg w-full max-w-[500px] p-6 sm:p-8"
-          >
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white text-center">
-              Create New Package
-            </h2>
-
-            {/* ERROR MESSAGE */}
-            {errorMessage && (
-              <p className="text-red-500 dark:text-red-400 text-sm mb-4 text-center">
-                {errorMessage}
-              </p>
-            )}
-
-            {/* PACKAGE NAME SELECT */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Package Name</label>
-              <select
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full border border-gray-300 dark:border-neutral-700 rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:ring-2 focus:ring-[#00A991]"
-              >
-                <option value="">Select package</option>
-                {packageOptions.map((pkg) => (
-                  <option key={pkg} value={pkg}>
-                    {pkg}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* AMOUNT */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Amount</label>
-              <input
-                type="number"
-                name="amount"
-                placeholder="Enter amount (0 for free)"
-                value={formData.amount}
-                onChange={handleInputChange}
-                disabled={formData.name === "Starter"}
-                className={`w-full border border-gray-300 dark:border-neutral-700 rounded-lg px-3 py-2 bg-transparent focus:outline-none focus:ring-2 focus:ring-[#00A991] ${
-                  formData.name === "Starter" ? "opacity-70 cursor-not-allowed" : ""
-                }`}
-              />
-            </div>
-
-            {/* IMAGE UPLOAD */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Upload Image (Optional)</label>
-              <div
-                className={`border-2 border-dashed ${
-                  formData.image ? "border-[#00A991]" : "border-gray-300 dark:border-neutral-700"
-                } rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#00A991] transition relative`}
-              >
-                {formData.image ? (
-                  <div className="relative w-full flex flex-col items-center">
-                    <img
-                      src={URL.createObjectURL(formData.image)}
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
-                    <div className="absolute bottom-2 left-0 right-0 bg-black/60 text-white text-sm py-1 text-center rounded-b-lg">
-                      {formData.image.name}
-                    </div>
-                    <button
-                      onClick={() => setFormData({ ...formData, image: null })}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                    >
-                      ✕
-                    </button>
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm z-50 px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-[550px] overflow-hidden border border-slate-200 dark:border-white/10"
+            >
+              <div className="p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">New Package</h2>
+                    <p className="text-slate-500 text-sm">Fill in the details to launch a new tier</p>
                   </div>
-                ) : (
-                  <>
-                    <Upload size={24} className="text-gray-500 mb-2" />
-                    <label
-                      htmlFor="imageUpload"
-                      className="text-sm text-gray-600 dark:text-gray-300 cursor-pointer"
-                    >
-                      Click to upload or drag and drop (PNG or JPEG, max 5MB)
-                    </label>
-                  </>
-                )}
-                <input
-                  type="file"
-                  name="image"
-                  accept="image/png,image/jpeg"
-                  onChange={handleInputChange}
-                  className="hidden"
-                  id="imageUpload"
-                />
-              </div>
-            </div>
+                  <button 
+                    onClick={() => { setShowModal(false); setErrorMessage(null); }}
+                    className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full text-slate-400"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
 
-            {/* BUTTONS */}
-            <div className="flex flex-col sm:flex-row w-full sm:space-x-3 gap-3">
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  setErrorMessage(null);
-                }}
-                className="px-6 py-2 rounded-lg border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-gray-300 w-full hover:bg-gray-100 dark:hover:bg-neutral-700 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="px-6 py-2 rounded-lg bg-[#00A991] text-white w-full hover:bg-green-700 transition"
-              >
-                Create Package
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+                {errorMessage && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6 p-4 bg-rose-50 dark:bg-rose-500/10 rounded-2xl border border-rose-100 dark:border-rose-500/20">
+                    <p className="text-rose-600 dark:text-rose-400 text-xs font-bold text-center uppercase tracking-wider">{errorMessage}</p>
+                  </motion.div>
+                )}
+
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Package Name</label>
+                    <select
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-semibold"
+                    >
+                      <option value="">Select a tier...</option>
+                      {packageOptions.map((pkg) => <option key={pkg} value={pkg}>{pkg}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Price (USD)</label>
+                    <input
+                      type="number"
+                      name="amount"
+                      placeholder="0.00"
+                      value={formData.amount}
+                      onChange={handleInputChange}
+                      disabled={formData.name === "Starter"}
+                      className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-semibold disabled:opacity-50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Cover Image</label>
+                    <div 
+                      className={`group relative border-2 border-dashed rounded-[2rem] p-6 transition-all flex flex-col items-center justify-center min-h-[160px] cursor-pointer
+                        ${formData.image ? "border-emerald-500 bg-emerald-50/5 dark:bg-emerald-500/5" : "border-slate-200 dark:border-slate-700 hover:border-emerald-500"}`}
+                    >
+                      {formData.image ? (
+                        <div className="w-full h-full text-center">
+                          <img src={URL.createObjectURL(formData.image)} alt="Preview" className="w-full h-32 object-cover rounded-2xl mb-3 shadow-lg" />
+                          <p className="text-emerald-500 text-xs font-bold truncate px-4">{formData.image.name}</p>
+                          <button onClick={() => setFormData({ ...formData, image: null })} className="absolute top-3 right-3 p-1.5 bg-rose-500 text-white rounded-full shadow-lg"><X size={14} /></button>
+                        </div>
+                      ) : (
+                        <label htmlFor="imageUpload" className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
+                          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl mb-3 text-slate-400 group-hover:text-emerald-500 transition-colors">
+                            <Upload size={24} />
+                          </div>
+                          <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Click to upload brand asset</span>
+                          <span className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">PNG or JPEG • Max 5MB</span>
+                        </label>
+                      )}
+                      <input type="file" id="imageUpload" name="image" accept="image/*" onChange={handleInputChange} className="hidden" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-10 flex gap-4">
+                  <button
+                    onClick={() => { setShowModal(false); setErrorMessage(null); }}
+                    className="flex-1 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    className="flex-[2] px-6 py-4 rounded-2xl bg-slate-900 dark:bg-emerald-600 text-white font-bold hover:bg-slate-800 dark:hover:bg-emerald-500 shadow-xl shadow-emerald-900/20 transition-all active:scale-95"
+                  >
+                    Launch Package
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* SUCCESS MODAL */}
-      {showSuccess && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg w-full max-w-[400px] p-6 sm:p-8 flex flex-col items-center justify-center text-center"
-          >
-            <img src={pic} alt="success" className="w-20 h-20 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Package Created Successfully!
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-300 mt-2">
-              The new package has been added successfully.
-            </p>
-          </motion.div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showSuccess && (
+          <div className="fixed inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm z-[60] px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl w-full max-w-[400px] p-10 flex flex-col items-center text-center border border-emerald-500/20"
+            >
+              <div className="relative mb-6">
+                <div className="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 animate-pulse" />
+                <img src={pic} alt="success" className="w-24 h-24 relative z-10" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">Package Created!</h3>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">The new investment tier is now live on the platform.</p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
