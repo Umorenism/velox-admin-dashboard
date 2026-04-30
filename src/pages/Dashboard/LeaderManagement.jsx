@@ -195,37 +195,41 @@ export default function LeaderManagement() {
   const [filter, setFilter] = useState({ rank: "all", role: "all" });
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [totalRes, activeRes, usersRes] = await Promise.all([
-          getTotalLeaders(),
-          getActiveLeaders(),
-          getleaderAllUsers(),
-        ]);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [totalRes, activeRes, usersRes] = await Promise.all([
+        getTotalLeaders(),
+        getActiveLeaders(),
+        getleaderAllUsers(),
+      ]);
 
-        setStats({
-          totalLeaders: totalRes?.total || 0,
-          activeLeaders: activeRes?.total || 0,
-        });
-        
-        const liveUsers = (usersRes || []).map(user => ({
-          ...user,
-          // 1. Fix: Ensure rank is never undefined/none-cased
-          rank: determineRank(user),
-          // 2. Fix: Maintenance of phone only, handling potential nulls
-          phone: user.phone || "N/A"
-        }));
-        
-        setUsers(liveUsers);
-      } catch (error) {
-        console.error("Critical: Data synchronization failed", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+      // 1. Filter raw data immediately to keep ONLY leaders
+      // We check for 'leader' role strictly.
+      const onlyLeaders = (usersRes || []).filter(
+        (user) => user.role?.toLowerCase() === "leader"
+      );
+
+      setStats({
+        totalLeaders: totalRes?.total || 0,
+        activeLeaders: activeRes?.total || 0,
+      });
+
+      const liveUsers = onlyLeaders.map((user) => ({
+        ...user,
+        rank: determineRank(user),
+        phone: user.phone || "N/A",
+      }));
+
+      setUsers(liveUsers);
+    } catch (error) {
+      console.error("Critical: Data synchronization failed", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, []);
 
   const determineRank = (user) => {
     // If the API already provides a rank string like "none", capitalize it
