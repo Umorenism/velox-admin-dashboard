@@ -78,3 +78,14 @@ export const activateUserPackage = async (userId, packageId) => {
 export const fundUserPackage = async (userId, data) => {
   return await apiClient.post(`/api/admin/users/fund`, { userId, ...data });
 };
+
+
+
+// ✅ New Deduct Wallet Endpoint
+export const deductUserWallet = async (userId, data) => {
+  return await apiClient.post(`/api/admin/users/deduct-wallet`, { 
+    userId, 
+    amount: Number(data.amount),
+    remark: data.remark || "Admin Deduction"
+  });
+};

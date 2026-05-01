@@ -894,24 +894,241 @@
 
 
 
+// import React, { useState, useMemo, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { activateUserPackage, fundUserPackage, getPackages } from "../api/userApi";
+// import { 
+//   Loader2, Zap, DollarSign, X, 
+//   ChevronLeft, ChevronRight, PackageCheck, 
+//   CheckCircle2, AlertTriangle, AlertCircle
+// } from "lucide-react";
+
+// const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, currentPage, setCurrentPage, onRefresh }) => {
+//   const [openModal, setOpenModal] = useState(false);
+//   const [modalType, setModalType] = useState(""); 
+//   const [selectedUser, setSelectedUser] = useState(null);
+//   const [actionLoading, setActionLoading] = useState(false);
+//   const [fundAmount, setFundAmount] = useState("");
+//   const [selectedPackageId, setSelectedPackageId] = useState("");
+  
+//   // Feedback States
+//   const [dbPackages, setDbPackages] = useState([]);
+//   const [notification, setNotification] = useState({ show: false, type: "", message: "" });
+
+//   useEffect(() => {
+//     const fetchPkgs = async () => {
+//       try {
+//         const data = await getPackages();
+//         setDbPackages(data);
+//       } catch (err) {
+//         console.error("Failed to load packages:", err);
+//       }
+//     };
+//     fetchPkgs();
+//   }, []);
+
+//   // Utility to show notification and auto-hide
+//   const triggerNotification = (type, message) => {
+//     setNotification({ show: true, type, message });
+//     setTimeout(() => {
+//       setNotification({ show: false, type: "", message: "" });
+//       if (type === "success") handleCloseModal();
+//     }, 3000);
+//   };
+
+//   const handleCloseModal = () => {
+//     if (actionLoading) return;
+//     setOpenModal(false);
+//     setSelectedUser(null);
+//     setFundAmount("");
+//     setNotification({ show: false, type: "", message: "" });
+//   };
+
+//   const handleAction = async (actionFn, defaultSuccessMsg) => {
+//     try {
+//       setActionLoading(true);
+//       const response = await actionFn();
+//       const data = response.data;
+
+//       if (data.message === "Package activated" || data.success || response.status === 200) {
+//         triggerNotification("success", data.message || defaultSuccessMsg);
+//         onRefresh(); 
+//       }
+//     } catch (err) {
+//       // Handles {"error": "User or package not found"}
+//       const errorMsg = err.response?.data?.error || err.response?.data?.message || "Operation Failed";
+//       triggerNotification("error", errorMsg);
+//     } finally {
+//       setActionLoading(false);
+//     }
+//   };
+
+//   const filteredUsers = useMemo(() => {
+//     if (!users || !Array.isArray(users)) return [];
+//     const q = searchTerm.toLowerCase().trim();
+//     return users.filter((u) => {
+//       const match = [u.name, u.email, u.phone].some(f => f?.toLowerCase().includes(q));
+//       const roleMatch = filter === "All" || u.role?.toLowerCase() === filter.toLowerCase();
+//       return match && roleMatch;
+//     });
+//   }, [users, searchTerm, filter]);
+
+//   const paginatedUsers = filteredUsers.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
+
+//   return (
+//     <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden">
+//       {/* ... Table Header & Body (Same as previous) ... */}
+//       <div className="overflow-x-auto">
+//         <table className="w-full text-left border-collapse">
+//           <thead>
+//             <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-white/5">
+//               {["S/N", "Identity", "Communication", "Status", "Command"].map((h) => (
+//                 <th key={h} className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{h}</th>
+//               ))}
+//             </tr>
+//           </thead>
+//           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
+//             {paginatedUsers.map((u, i) => (
+//               <tr key={u._id} className="group hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all">
+//                 <td className="px-8 py-5 text-xs font-black text-slate-400">{((currentPage - 1) * entriesPerPage + i + 1).toString().padStart(2, '0')}</td>
+//                 <td className="px-8 py-5">
+//                   <div className="font-bold text-slate-900 dark:text-white text-sm">{u.name}</div>
+//                   <div className="text-[10px] text-slate-500 font-mono mt-0.5">{u._id}</div>
+//                 </td>
+//                 <td className="px-8 py-5">
+//                   <div className="text-xs font-bold text-slate-600 dark:text-slate-300">{u.email}</div>
+//                 </td>
+//                 <td className="px-8 py-5">
+//                   <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-500">{u.role}</span>
+//                 </td>
+//                 <td className="px-8 py-5">
+//                   <div className="flex gap-2">
+//                     <button onClick={() => { setSelectedUser(u); setModalType("activate"); setSelectedPackageId(dbPackages[0]?._id); setOpenModal(true); }} className="p-2.5 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all"><Zap size={16} /></button>
+//                     <button onClick={() => { setSelectedUser(u); setModalType("fund"); setOpenModal(true); }} className="p-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white rounded-xl hover:bg-slate-900 hover:text-white transition-all"><DollarSign size={16} /></button>
+//                   </div>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       </div>
+
+//       {/* MODAL SYSTEM WITH INTEGRATED NOTIFICATIONS */}
+//       <AnimatePresence>
+//         {openModal && selectedUser && (
+//           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+//             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={handleCloseModal} className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" />
+            
+//             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[3rem] p-10 shadow-3xl border border-white/10 overflow-hidden">
+              
+//               {/* STATUS OVERLAY (SUCCESS/ERROR) */}
+//               <AnimatePresence>
+//                 {notification.show && (
+//                   <motion.div 
+//                     initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100 }}
+//                     className={`absolute top-0 left-0 right-0 p-6 flex items-center justify-center gap-3 z-50 ${
+//                       notification.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"
+//                     }`}
+//                   >
+//                     {notification.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+//                     <span className="text-xs font-black uppercase tracking-widest">{notification.message}</span>
+//                   </motion.div>
+//                 )}
+//               </AnimatePresence>
+
+//               <div className="mb-8">
+//                  <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-6 ${modalType === 'activate' ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}>
+//                     {modalType === 'activate' ? <PackageCheck size={32} /> : <DollarSign size={32} />}
+//                  </div>
+//                  <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+//                     {modalType === "activate" ? "Deploy Package" : "Manual Funding"}
+//                  </h3>
+//                  <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">{selectedUser.email}</p>
+//               </div>
+
+//               {modalType === "activate" ? (
+//                 <div className="mb-10">
+//                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Select Real Package</label>
+//                   <select
+//                     value={selectedPackageId}
+//                     onChange={(e) => setSelectedPackageId(e.target.value)}
+//                     className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none appearance-none"
+//                   >
+//                     {dbPackages.map((pkg) => (
+//                       <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>
+//                     ))}
+//                   </select>
+//                 </div>
+//               ) : (
+//                 <div className="mb-10">
+//                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Amount to Inject (USD)</label>
+//                   <input
+//                     type="number"
+//                     value={fundAmount}
+//                     onChange={(e) => setFundAmount(e.target.value)}
+//                     placeholder="0.00"
+//                     className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-5 text-2xl font-black text-slate-900 dark:text-white outline-none"
+//                   />
+//                 </div>
+//               )}
+
+//               <div className="flex flex-col gap-4">
+//                 <button
+//                   onClick={() => modalType === 'activate' 
+//                     ? handleAction(() => activateUserPackage(selectedUser._id, selectedPackageId), "Package Activated Successfully") 
+//                     : handleAction(() => fundUserPackage(selectedUser._id, { amount: Number(fundAmount) }), "Funds Injected Successfully")
+//                   }
+//                   disabled={actionLoading || (modalType === "fund" && !fundAmount)}
+//                   className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.25rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
+//                 >
+//                   {actionLoading ? <Loader2 className="animate-spin" size={18} /> : "Execute Transaction"}
+//                 </button>
+//                 <button 
+//                   onClick={handleCloseModal} 
+//                   className="w-full py-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-slate-600 transition-colors"
+//                 >
+//                   Cancel and Return
+//                 </button>
+//               </div>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// export default UserTable;
+
+
+
+
+
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { activateUserPackage, fundUserPackage, getPackages } from "../api/userApi";
+import { 
+  activateUserPackage, 
+  fundUserPackage, 
+  getPackages, 
+  deductUserWallet 
+} from "../api/userApi";
 import { 
   Loader2, Zap, DollarSign, X, 
-  ChevronLeft, ChevronRight, PackageCheck, 
-  CheckCircle2, AlertTriangle, AlertCircle
+  PackageCheck, CheckCircle2, AlertCircle,
+  MinusCircle 
 } from "lucide-react";
 
 const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, currentPage, setCurrentPage, onRefresh }) => {
   const [openModal, setOpenModal] = useState(false);
-  const [modalType, setModalType] = useState(""); 
+  const [modalType, setModalType] = useState(""); // "activate", "fund", or "deduct"
   const [selectedUser, setSelectedUser] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  
+  // ✅ Form States initialized as empty strings
   const [fundAmount, setFundAmount] = useState("");
+  const [deductRemark, setDeductRemark] = useState("");
   const [selectedPackageId, setSelectedPackageId] = useState("");
   
-  // Feedback States
   const [dbPackages, setDbPackages] = useState([]);
   const [notification, setNotification] = useState({ show: false, type: "", message: "" });
 
@@ -927,7 +1144,6 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
     fetchPkgs();
   }, []);
 
-  // Utility to show notification and auto-hide
   const triggerNotification = (type, message) => {
     setNotification({ show: true, type, message });
     setTimeout(() => {
@@ -940,7 +1156,8 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
     if (actionLoading) return;
     setOpenModal(false);
     setSelectedUser(null);
-    setFundAmount("");
+    setFundAmount("");    // Reset to empty
+    setDeductRemark("");  // Reset to empty
     setNotification({ show: false, type: "", message: "" });
   };
 
@@ -950,12 +1167,11 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
       const response = await actionFn();
       const data = response.data;
 
-      if (data.message === "Package activated" || data.success || response.status === 200) {
+      if (response.status === 200 || data.success) {
         triggerNotification("success", data.message || defaultSuccessMsg);
         onRefresh(); 
       }
     } catch (err) {
-      // Handles {"error": "User or package not found"}
       const errorMsg = err.response?.data?.error || err.response?.data?.message || "Operation Failed";
       triggerNotification("error", errorMsg);
     } finally {
@@ -976,8 +1192,7 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
 
   return (
-    <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden">
-      {/* ... Table Header & Body (Same as previous) ... */}
+    <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden font-sans">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -1003,8 +1218,20 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
                 </td>
                 <td className="px-8 py-5">
                   <div className="flex gap-2">
-                    <button onClick={() => { setSelectedUser(u); setModalType("activate"); setSelectedPackageId(dbPackages[0]?._id); setOpenModal(true); }} className="p-2.5 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all"><Zap size={16} /></button>
-                    <button onClick={() => { setSelectedUser(u); setModalType("fund"); setOpenModal(true); }} className="p-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white rounded-xl hover:bg-slate-900 hover:text-white transition-all"><DollarSign size={16} /></button>
+                    <button 
+                      onClick={() => { setSelectedUser(u); setModalType("activate"); setSelectedPackageId(dbPackages[0]?._id); setOpenModal(true); }} 
+                      className="p-2.5 bg-emerald-500/10 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all"
+                    ><Zap size={16} /></button>
+                    
+                    <button 
+                      onClick={() => { setSelectedUser(u); setModalType("fund"); setOpenModal(true); }} 
+                      className="p-2.5 bg-blue-500/10 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all"
+                    ><DollarSign size={16} /></button>
+
+                    <button 
+                      onClick={() => { setSelectedUser(u); setModalType("deduct"); setOpenModal(true); }} 
+                      className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                    ><MinusCircle size={16} /></button>
                   </div>
                 </td>
               </tr>
@@ -1013,7 +1240,6 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
         </table>
       </div>
 
-      {/* MODAL SYSTEM WITH INTEGRATED NOTIFICATIONS */}
       <AnimatePresence>
         {openModal && selectedUser && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -1021,15 +1247,10 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
             
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[3rem] p-10 shadow-3xl border border-white/10 overflow-hidden">
               
-              {/* STATUS OVERLAY (SUCCESS/ERROR) */}
+              {/* Notification Overlay */}
               <AnimatePresence>
                 {notification.show && (
-                  <motion.div 
-                    initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100 }}
-                    className={`absolute top-0 left-0 right-0 p-6 flex items-center justify-center gap-3 z-50 ${
-                      notification.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"
-                    }`}
-                  >
+                  <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100 }} className={`absolute top-0 left-0 right-0 p-6 flex items-center justify-center gap-3 z-50 ${notification.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}`}>
                     {notification.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
                     <span className="text-xs font-black uppercase tracking-widest">{notification.message}</span>
                   </motion.div>
@@ -1037,11 +1258,14 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
               </AnimatePresence>
 
               <div className="mb-8">
-                 <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-6 ${modalType === 'activate' ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}>
-                    {modalType === 'activate' ? <PackageCheck size={32} /> : <DollarSign size={32} />}
+                 <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-6 ${
+                   modalType === 'activate' ? 'bg-emerald-500 text-white' : 
+                   modalType === 'fund' ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'
+                 }`}>
+                    {modalType === 'activate' ? <PackageCheck size={32} /> : modalType === 'fund' ? <DollarSign size={32} /> : <MinusCircle size={32} />}
                  </div>
                  <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                    {modalType === "activate" ? "Deploy Package" : "Manual Funding"}
+                    {modalType === "activate" ? "Deploy Package" : modalType === "fund" ? "Manual Funding" : "Deduct Funds"}
                  </h3>
                  <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">{selectedUser.email}</p>
               </div>
@@ -1049,46 +1273,59 @@ const UserTable = ({ users = [], loading, searchTerm, filter, entriesPerPage, cu
               {modalType === "activate" ? (
                 <div className="mb-10">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Select Real Package</label>
-                  <select
-                    value={selectedPackageId}
-                    onChange={(e) => setSelectedPackageId(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none appearance-none"
-                  >
-                    {dbPackages.map((pkg) => (
-                      <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>
-                    ))}
+                  <select value={selectedPackageId} onChange={(e) => setSelectedPackageId(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none appearance-none">
+                    {dbPackages.map((pkg) => <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>)}
                   </select>
                 </div>
               ) : (
-                <div className="mb-10">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Amount to Inject (USD)</label>
-                  <input
-                    type="number"
-                    value={fundAmount}
-                    onChange={(e) => setFundAmount(e.target.value)}
-                    placeholder="0.00"
-                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-5 text-2xl font-black text-slate-900 dark:text-white outline-none"
-                  />
+                <div className="space-y-6 mb-10">
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Amount (USD)</label>
+                    <input 
+                      type="number" 
+                      value={fundAmount} 
+                      onChange={(e) => setFundAmount(e.target.value)} 
+                      placeholder="0.00" 
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-5 text-2xl font-black text-slate-900 dark:text-white outline-none" 
+                    />
+                  </div>
+                  
+                  {modalType === "deduct" && (
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Deduction Remark</label>
+                      <input 
+                        type="text" 
+                        value={deductRemark} 
+                        onChange={(e) => setDeductRemark(e.target.value)} 
+                        placeholder="e.g. Penalty or Correction" 
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.25rem] px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none" 
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
               <div className="flex flex-col gap-4">
                 <button
-                  onClick={() => modalType === 'activate' 
-                    ? handleAction(() => activateUserPackage(selectedUser._id, selectedPackageId), "Package Activated Successfully") 
-                    : handleAction(() => fundUserPackage(selectedUser._id, { amount: Number(fundAmount) }), "Funds Injected Successfully")
-                  }
-                  disabled={actionLoading || (modalType === "fund" && !fundAmount)}
-                  className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.25rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
+                  onClick={() => {
+                    if (modalType === 'activate') {
+                      handleAction(() => activateUserPackage(selectedUser._id, selectedPackageId), "Package Activated");
+                    } else if (modalType === 'fund') {
+                      handleAction(() => fundUserPackage(selectedUser._id, { amount: fundAmount }), "Funds Injected");
+                    } else {
+                      handleAction(() => deductUserWallet(selectedUser._id, { amount: fundAmount, remark: deductRemark }), "Funds Deducted");
+                    }
+                  }}
+                  disabled={actionLoading || (modalType !== 'activate' && !fundAmount)}
+                  className={`w-full py-5 rounded-[1.25rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 ${
+                    modalType === 'deduct' ? 'bg-red-600 text-white' : 
+                    modalType === 'fund' ? 'bg-blue-600 text-white' :
+                    'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                  }`}
                 >
                   {actionLoading ? <Loader2 className="animate-spin" size={18} /> : "Execute Transaction"}
                 </button>
-                <button 
-                  onClick={handleCloseModal} 
-                  className="w-full py-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-slate-600 transition-colors"
-                >
-                  Cancel and Return
-                </button>
+                <button onClick={handleCloseModal} className="w-full py-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-slate-600 transition-colors">Cancel and Return</button>
               </div>
             </motion.div>
           </div>
