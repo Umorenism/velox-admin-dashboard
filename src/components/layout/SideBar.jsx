@@ -1260,7 +1260,8 @@ export default function SideBar({ closeSidebar }) {
     { to: "/dashboard/leaders", label: "Leader Oversight", icon: <Crown size={18} /> },
     { to: "/dashboard/package", label: "System Wallets", icon: <Wallet size={18} /> },
     { to: "/dashboard/transactions", label: "Global Ledger", icon: <CreditCard size={18} /> },
-    { to: "/dashboard/withdrawal-management", label: "Fraud Control", icon: <ShieldCheck size={18} /> },
+    { to: "/dashboard/withdrawal-management", label: "Admin Frozen Control", icon: <ShieldCheck size={18} /> },
+    { to: "/dashboard/training", label: "Training Academy", icon: <GraduationCap size={18} /> },
   ];
 
   const dropdowns = [

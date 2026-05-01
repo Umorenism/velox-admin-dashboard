@@ -15,6 +15,12 @@ export const getWithdrawals = async () => {
 
 
 
+export const getUsersForAdmin = async () => {
+  // This endpoint should return the list of users with withdrawalFrozen status
+  const response = await apiClient.get('/api/admin/users');
+  return response.data;
+};
+
 export const freezeUserWithdrawal = async (userId, reason) => {
   const response = await apiClient.post('/api/admin/users/freeze-withdrawal', {
     userId,

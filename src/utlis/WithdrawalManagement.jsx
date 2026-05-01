@@ -1,103 +1,341 @@
-import React, { useState } from "react";
+// import React, { useState, useEffect } from "react";
+// import { 
+//   ShieldAlert, ShieldCheck, Lock, Unlock, 
+//   Loader2, Search, UserX, RefreshCw 
+// } from "lucide-react";
+// import { 
+//   getUsersForAdmin, 
+//   freezeUserWithdrawal, 
+//   unfreezeUserWithdrawal 
+// } from "../api/withdrawalApi";
+// import { toast } from "react-hot-toast";
+
+// const WithdrawalManagement = () => {
+//   const [users, setUsers] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [processingId, setProcessingId] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+
+//   // FETCH DATA ON LOAD
+//   const fetchData = async () => {
+//     try {
+//       setLoading(true);
+//       const data = await getUsersForAdmin();
+//       // Handle both { users: [] } and direct array [ ] responses
+//       const userList = Array.isArray(data) ? data : (data.users || []);
+//       setUsers(userList);
+//     } catch (err) {
+//       toast.error("Failed to load user ledger");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchData();
+//   }, []);
+
+//   // FILTER LOGIC
+//   const filteredUsers = users.filter(u => {
+//     const searchStr = searchTerm.toLowerCase();
+//     return (
+//       u.name?.toLowerCase().includes(searchStr) || 
+//       u.email?.toLowerCase().includes(searchStr) ||
+//       (u._id || u.id)?.includes(searchStr)
+//     );
+//   });
+
+//   // ACTION LOGIC
+//   const handleToggleFreeze = async (user) => {
+//     const userId = user._id || user.id;
+//     const isCurrentlyFrozen = user.withdrawalFrozen;
+    
+//     let reason = "";
+//     if (!isCurrentlyFrozen) {
+//       reason = window.prompt("Reason for freeze:", "Leadership Account - Admin Frozen");
+//       if (reason === null) return; 
+//     }
+
+//     setProcessingId(userId);
+//     try {
+//       const res = isCurrentlyFrozen 
+//         ? await unfreezeUserWithdrawal(userId)
+//         : await freezeUserWithdrawal(userId, reason || "Admin Frozen");
+
+//       if (res.success) {
+//         // Update local state with the returned user object
+//         setUsers(prev => prev.map(u => 
+//           (u._id === userId || u.id === userId) ? { ...u, ...res.user } : u
+//         ));
+//         toast.success(res.message);
+//       }
+//     } catch (err) {
+//       toast.error(err.response?.data?.message || "Action failed");
+//     } finally {
+//       setProcessingId(null);
+//     }
+//   };
+
+//   if (loading) return (
+//     <div className="flex flex-col items-center justify-center py-20">
+//       <Loader2 className="animate-spin text-emerald-500 mb-4" size={32} />
+//       <p className="text-slate-500 font-bold text-xs tracking-widest uppercase">Fetching Security Protocols...</p>
+//     </div>
+//   );
+
+//   return (
+//     <div className="w-full bg-white dark:bg-slate-950 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-2xl overflow-hidden">
+//       {/* HEADER */}
+//       <div className="p-6 md:p-8 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20">
+//         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+//           <div className="flex items-center gap-4">
+//             <div className="bg-emerald-500 p-3 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
+//               <ShieldCheck size={24} />
+//             </div>
+//             <div>
+//               <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Withdrawal Control</h2>
+//               <p className="text-slate-500 text-xs font-medium">Manage global payout permissions</p>
+//             </div>
+//           </div>
+
+//           <div className="flex items-center gap-3 w-full md:w-auto">
+//             <div className="relative flex-1 md:w-80">
+//               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+//               <input 
+//                 type="text" 
+//                 placeholder="Search users..."
+//                 className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/10 text-sm outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white"
+//                 value={searchTerm}
+//                 onChange={(e) => setSearchTerm(e.target.value)}
+//               />
+//             </div>
+//             <button onClick={fetchData} className="p-3 hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl text-slate-400 transition-colors">
+//               <RefreshCw size={20} />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* TABLE */}
+//       <div className="overflow-x-auto p-4 md:p-6">
+//         <table className="w-full text-left border-separate border-spacing-y-2">
+//           <thead>
+//             <tr className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black">
+//               <th className="px-6 py-3">User Identity</th>
+//               <th className="px-6 py-3">Payout Status</th>
+//               <th className="px-6 py-3">Reason</th>
+//               <th className="px-6 py-3 text-right">Administrative Action</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {filteredUsers.map((user) => {
+//               const uId = user._id || user.id;
+//               const isFrozen = user.withdrawalFrozen;
+//               const isWorking = processingId === uId;
+
+//               return (
+//                 <tr key={uId} className="group bg-slate-50/50 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.05] transition-all">
+//                   <td className="px-6 py-5 rounded-l-3xl border-y border-l border-transparent hover:border-slate-200 dark:hover:border-white/10">
+//                     <div className="flex flex-col">
+//                       <span className="text-sm font-bold text-slate-900 dark:text-white">{user.name || "Unknown User"}</span>
+//                       <span className="text-[10px] text-slate-500 font-mono truncate max-w-[120px]">{user.email}</span>
+//                     </div>
+//                   </td>
+                  
+//                   <td className="px-6 py-5 border-y border-transparent">
+//                     <div className={`flex items-center gap-2 text-[9px] font-black uppercase px-3 py-1 rounded-full w-fit ${
+//                       isFrozen ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-500'
+//                     }`}>
+//                       {isFrozen ? <Lock size={12} /> : <Unlock size={12} />}
+//                       {isFrozen ? "Frozen" : "Active"}
+//                     </div>
+//                   </td>
+
+//                   <td className="px-6 py-5 border-y border-transparent">
+//                     <p className="text-[11px] text-slate-400 italic">
+//                       {isFrozen ? (user.frozenReason || "System Restricted") : "No restrictions"}
+//                     </p>
+//                   </td>
+
+//                   <td className="px-6 py-5 text-right rounded-r-3xl border-y border-r border-transparent">
+//                     <button
+//                       onClick={() => handleToggleFreeze(user)}
+//                       disabled={isWorking}
+//                       className={`
+//                         inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
+//                         ${isFrozen ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-rose-600 text-white hover:bg-rose-500'}
+//                         disabled:opacity-40 active:scale-95
+//                       `}
+//                     >
+//                       {isWorking ? <Loader2 size={14} className="animate-spin" /> : (isFrozen ? "Restore Payouts" : "Freeze Payouts")}
+//                     </button>
+//                   </td>
+//                 </tr>
+//               );
+//             })}
+//           </tbody>
+//         </table>
+        
+//         {filteredUsers.length === 0 && (
+//           <div className="py-20 text-center">
+//             <UserX className="mx-auto text-slate-200 dark:text-slate-800 mb-4" size={48} />
+//             <p className="text-slate-500 font-bold uppercase text-xs tracking-tighter">No users found matching query</p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default WithdrawalManagement;
+
+
+
+
+
+import React, { useState, useEffect } from "react";
 import { 
-  ShieldAlert, 
-  ShieldCheck, 
-  Lock, 
-  Unlock, 
-  Loader2, 
-  Search,
-  UserX
+  ShieldAlert, ShieldCheck, Lock, Unlock, 
+  Loader2, Search, UserX, RefreshCw, ShieldOff 
 } from "lucide-react";
-import { freezeUserWithdrawal, unfreezeUserWithdrawal } from "../api/withdrawalApi";
+import { 
+  getUsersForAdmin, 
+  freezeUserWithdrawal, 
+  unfreezeUserWithdrawal 
+} from "../api/withdrawalApi";
 import { toast } from "react-hot-toast";
 
-// 1. users = [] handles the case where the prop is missing or undefined
-const WithdrawalManagement = ({ users = [], setUsers }) => {
+const WithdrawalManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 2. Defensive check for filteredUsers to prevent crash
-  const filteredUsers = (users || []).filter(u => {
-    if (!u) return false;
+  // 1. DATA FETCHING WITH ADMIN EXCLUSION
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const data = await getUsersForAdmin();
+      
+      // Get raw list from either data or data.users
+      const rawList = Array.isArray(data) ? data : (data.users || []);
+
+      // EXCLUDE ADMINS: Only keep users who are NOT admins
+      const onlyClients = rawList.filter(user => {
+        const isAdminRole = user.role?.toLowerCase() === "admin";
+        const isAdminFlag = user.isAdmin === true;
+        return !isAdminRole && !isAdminFlag;
+      });
+
+      setUsers(onlyClients);
+    } catch (err) {
+      toast.error("Failed to load user ledger");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // 2. SEARCH FILTERING
+  const filteredUsers = users.filter(u => {
     const searchStr = searchTerm.toLowerCase();
     return (
       u.name?.toLowerCase().includes(searchStr) || 
       u.email?.toLowerCase().includes(searchStr) ||
-      u.id?.includes(searchStr) ||
-      u._id?.includes(searchStr)
+      (u._id || u.id)?.includes(searchStr)
     );
   });
 
+  // 3. TOGGLE FREEZE LOGIC
   const handleToggleFreeze = async (user) => {
     const userId = user._id || user.id;
     const isCurrentlyFrozen = user.withdrawalFrozen;
-    const reason = "Leadership Account - Admin Frozen";
+    
+    let reason = "";
+    if (!isCurrentlyFrozen) {
+      reason = window.prompt("Reason for freeze:", "Leadership Account - Admin Frozen");
+      if (reason === null) return; 
+    }
 
     setProcessingId(userId);
-    
     try {
-      let res;
-      if (isCurrentlyFrozen) {
-        res = await unfreezeUserWithdrawal(userId);
-      } else {
-        res = await freezeUserWithdrawal(userId, reason);
-      }
+      const res = isCurrentlyFrozen 
+        ? await unfreezeUserWithdrawal(userId)
+        : await freezeUserWithdrawal(userId, reason || "Admin Frozen");
 
       if (res.success) {
-        // Optimistic UI Update
-        setUsers((prev) =>
-          prev.map((u) =>
-            (u._id === userId || u.id === userId) 
-              ? { ...u, withdrawalFrozen: !isCurrentlyFrozen, frozenReason: isCurrentlyFrozen ? "" : reason }
-              : u
-          )
-        );
-        toast.success(res.message || `Status updated for ${user.name}`);
+        // Update local state with the returned user object from API
+        setUsers(prev => prev.map(u => 
+          (u._id === userId || u.id === userId) ? { ...u, ...res.user } : u
+        ));
+        toast.success(res.message);
       }
     } catch (err) {
-      const msg = err.response?.data?.message || "Operation failed";
-      toast.error(msg);
+      toast.error(err.response?.data?.message || "Action failed");
     } finally {
       setProcessingId(null);
     }
   };
 
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center py-32">
+      <Loader2 className="animate-spin text-emerald-500 mb-4" size={32} />
+      <p className="text-slate-500 font-bold text-[10px] tracking-[0.2em] uppercase">Initializing Secure Ledger...</p>
+    </div>
+  );
+
   return (
-    <div className="w-full bg-white dark:bg-slate-950 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-2xl overflow-hidden">
-      {/* HEADER SECTION */}
-      <div className="p-6 md:p-8 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/20">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Withdrawal Management
-            </h2>
-            <p className="text-slate-500 text-sm font-medium mt-1">
-              Freeze or unfreeze user payouts globally
-            </p>
+    <div className="w-full bg-white dark:bg-slate-950 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-2xl overflow-hidden">
+      
+      {/* HEADER */}
+      <div className="p-8 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-900/10">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-5">
+            <div className="bg-rose-600 p-3.5 rounded-2xl text-white shadow-xl shadow-rose-600/20">
+              <ShieldAlert size={24} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Payout Security</h2>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1 opacity-70">
+                {users.length} Active Client Accounts
+              </p>
+            </div>
           </div>
 
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search ID, Name or Email..."
-              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-emerald-500 text-sm outline-none transition-all dark:text-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative flex-1 md:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <input 
+                type="text" 
+                placeholder="Filter by Name, Email or ID..."
+                className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/10 text-sm font-medium outline-none focus:ring-2 focus:ring-rose-500 transition-all dark:text-white"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <button 
+              onClick={fetchData} 
+              className="p-4 hover:bg-slate-100 dark:hover:bg-white/5 rounded-2xl text-slate-400 transition-all active:scale-90"
+            >
+              <RefreshCw size={20} />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* TABLE SECTION */}
-      <div className="overflow-x-auto p-4 md:p-6">
-        <table className="w-full text-left border-separate border-spacing-y-2">
+      {/* USER TABLE */}
+      <div className="overflow-x-auto p-4 md:p-8">
+        <table className="w-full text-left border-separate border-spacing-y-3">
           <thead>
-            <tr className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black">
-              <th className="px-4 py-3">Account Information</th>
-              <th className="px-4 py-3">Payout Status</th>
-              <th className="px-4 py-3">Reasoning</th>
-              <th className="px-4 py-3 text-right">Action</th>
+            <tr className="text-slate-400 text-[10px] uppercase tracking-[0.25em] font-black">
+              <th className="px-6 py-4">Client Information</th>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Security Note</th>
+              <th className="px-6 py-4 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -107,49 +345,48 @@ const WithdrawalManagement = ({ users = [], setUsers }) => {
               const isWorking = processingId === uId;
 
               return (
-                <tr key={uId} className="group bg-white dark:bg-slate-900 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all">
-                  <td className="px-4 py-4 rounded-l-2xl border-y border-l border-slate-100 dark:border-white/5">
+                <tr key={uId} className="group bg-slate-50/50 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.05] transition-all duration-300">
+                  <td className="px-6 py-5 rounded-l-[1.5rem] border-y border-l border-transparent group-hover:border-slate-200 dark:group-hover:border-white/10">
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">{user.name}</span>
-                      <span className="text-[10px] text-slate-500 font-mono uppercase">{uId}</span>
+                      <span className="text-sm font-black text-slate-900 dark:text-white">{user.name || "N/A"}</span>
+                      <span className="text-[10px] text-slate-500 font-mono mt-0.5">{user.email}</span>
                     </div>
                   </td>
                   
-                  <td className="px-4 py-4 border-y border-slate-100 dark:border-white/5">
-                    <div className={`flex items-center gap-2 text-[10px] font-black uppercase px-3 py-1 rounded-full w-fit ${
-                      isFrozen ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-500'
+                  <td className="px-6 py-5 border-y border-transparent">
+                    <div className={`flex items-center gap-2 text-[9px] font-black uppercase px-3.5 py-1.5 rounded-full w-fit ${
+                      isFrozen ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                     }`}>
-                      {isFrozen ? <Lock size={12} /> : <Unlock size={12} />}
+                      {isFrozen ? <Lock size={12} strokeWidth={3} /> : <Unlock size={12} strokeWidth={3} />}
                       {isFrozen ? "Frozen" : "Active"}
                     </div>
                   </td>
 
-                  <td className="px-4 py-4 border-y border-slate-100 dark:border-white/5">
-                    <p className="text-xs text-slate-400 max-w-[200px] truncate">
-                      {isFrozen ? (user.frozenReason || "System Restricted") : "—"}
+                  <td className="px-6 py-5 border-y border-transparent">
+                    <p className="text-[11px] text-slate-400 font-medium">
+                      {isFrozen ? (user.frozenReason || "Administrative Lock") : "No restrictions"}
                     </p>
                   </td>
 
-                  <td className="px-4 py-4 text-right rounded-r-2xl border-y border-r border-slate-100 dark:border-white/5">
+                  <td className="px-6 py-5 text-right rounded-r-[1.5rem] border-y border-r border-transparent">
                     <button
                       onClick={() => handleToggleFreeze(user)}
                       disabled={isWorking}
                       className={`
                         inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
                         ${isFrozen 
-                          ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
-                          : 'bg-rose-600 text-white hover:bg-rose-500'}
-                        disabled:opacity-40 active:scale-95 shadow-lg ${isFrozen ? 'shadow-emerald-500/20' : 'shadow-rose-500/20'}
+                          ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-500/20' 
+                          : 'bg-rose-600 text-white hover:bg-rose-500 shadow-lg shadow-rose-600/20'}
+                        disabled:opacity-40 active:scale-95
                       `}
                     >
                       {isWorking ? (
                         <Loader2 size={14} className="animate-spin" />
                       ) : isFrozen ? (
-                        <ShieldCheck size={14} />
+                        <> <ShieldCheck size={14} /> Unfreeze </>
                       ) : (
-                        <ShieldAlert size={14} />
+                        <> <ShieldOff size={14} /> Freeze </>
                       )}
-                      {isFrozen ? "Unfreeze" : "Freeze"}
                     </button>
                   </td>
                 </tr>
@@ -160,12 +397,12 @@ const WithdrawalManagement = ({ users = [], setUsers }) => {
         
         {/* EMPTY STATE */}
         {filteredUsers.length === 0 && (
-          <div className="py-32 text-center flex flex-col items-center justify-center">
-            <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-full mb-4">
-              <UserX className="text-slate-300 dark:text-slate-700" size={40} />
+          <div className="py-24 text-center flex flex-col items-center">
+            <div className="bg-slate-100 dark:bg-slate-900 p-6 rounded-full mb-4">
+              <UserX className="text-slate-300 dark:text-slate-700" size={48} />
             </div>
-            <h3 className="text-slate-900 dark:text-white font-bold">No Records Found</h3>
-            <p className="text-slate-500 text-xs uppercase tracking-widest mt-1">Adjust your search or filter</p>
+            <h3 className="text-slate-900 dark:text-white font-black uppercase text-sm tracking-widest">No Clients Found</h3>
+            <p className="text-slate-500 text-xs mt-2">Admins are excluded from this list by default.</p>
           </div>
         )}
       </div>
