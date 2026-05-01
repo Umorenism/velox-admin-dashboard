@@ -35,3 +35,17 @@ export const unfreezeUserWithdrawal = async (userId) => {
   });
   return response.data;
 };
+
+
+
+
+// --- Restriction Endpoints ---
+export const restrictUser = async (userId, reason) => {
+  const response = await apiClient.post('/api/admin/users/restrict', { userId, reason });
+  return response.data;
+};
+
+export const unrestrictUser = async (userId) => {
+  const response = await apiClient.post('/api/admin/users/unrestrict', { userId });
+  return response.data;
+};
