@@ -53,6 +53,7 @@ import Unilevel from "../pages/network/Unilevel";
 import Matrix from "../pages/network/Matrix";
 import Ranks from "../pages/network/Ranks";
 import Wallet from "../pages/wallet/Wallet";
+import WithdrawalManagement from "../utlis/WithdrawalManagement";
 
 export default function AppRouter() {
   return (
@@ -79,6 +80,7 @@ export default function AppRouter() {
       <Route path="create" element={<CreateRole />} />
       <Route path="courses" element={<AdminUploadCourse />} />
       <Route path="email" element={<EmailPage />} />
+      <Route path="withdrawal-management" element={<WithdrawalManagement/>} />
 
       {/* Monthly */}
       <Route path="monthly/income-calculator" element={<IncomeCalculator />} />
