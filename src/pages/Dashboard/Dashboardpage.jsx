@@ -694,12 +694,12 @@ export default function Dashboardpage() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <div className="bg-white dark:bg-slate-900/50 p-4 rounded-[2.5rem] border border-slate-200 dark:border-white/5">
              <div className="px-4 py-2 mb-4">
                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">User Growth Analytics</h3>
              </div>
-             {/* These components should also be verified to use live props if they don't already fetch their own data */}
+            
             <UserActiveGraphy />
           </div>
 
@@ -709,7 +709,7 @@ export default function Dashboardpage() {
              </div>
             <FreePackageGraphy />
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white dark:bg-slate-900/50 p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/5">
           <div className="mb-6 px-4">
