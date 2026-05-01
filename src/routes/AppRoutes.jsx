@@ -16,6 +16,7 @@ import Unilevel from "../pages/network/Unilevel";
 import Matrix from "../pages/network/Matrix";
 import Settings from "../pages/Dashboard/Settings";
 import NotFound from "../pages/Dashboard/NotFound";
+import ManageWithdrawal from "../utlis/ManageWithdrawal";
 
 export default function AppRouter() {
   return (
@@ -34,6 +35,7 @@ export default function AppRouter() {
           <Route path="transactions" element={<Transaction />} />
           <Route path="withdrawal-management" element={<WithdrawalManagement/>} />
           <Route path="training" element={<CourseManager />} />
+          <Route path="manage-withdrawals" element={<ManageWithdrawal />} />
 
           {/* Network Mapping Section */}
           <Route path="network/unilevel" element={<Unilevel />} />
