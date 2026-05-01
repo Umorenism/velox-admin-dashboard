@@ -83,6 +83,7 @@ import { jwtDecode } from "jwt-decode";
 export const ProtectedRoute = () => {
   const token = localStorage.getItem("access_token");
 
+  // 1. No token? Direct bounce to login
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -90,28 +91,34 @@ export const ProtectedRoute = () => {
   try {
     const decoded = jwtDecode(token);
     
-    // Check expiration
-    const isExpired = decoded.exp * 1000 < Date.now();
-    if (isExpired) {
+    // 2. Check Expiration
+    // (exp is in seconds, Date.now() is in milliseconds)
+    const currentTime = Date.now();
+    const tokenExp = decoded.exp * 1000;
+
+    if (tokenExp < currentTime) {
+      console.warn("Access Token Expired");
       localStorage.clear();
       return <Navigate to="/login" replace />;
     }
 
-    // ✅ CHECK: Role must be 'admin' or 'superadmin'
-    // Your API res showed "role": "admin"
-    const userRole = decoded.role?.toLowerCase();
+    // 3. THE WALL: Strictly allow only admin or superadmin
+    const userRole = (decoded.role || "").toLowerCase();
     const allowedRoles = ["admin", "superadmin"];
 
     if (!allowedRoles.includes(userRole)) {
-      console.error("Access Denied: Invalid Role", userRole);
-      localStorage.clear();
+      console.error("Access Denied: Role", userRole, "is not authorized.");
+      localStorage.clear(); 
       return <Navigate to="/login" replace />;
     }
 
+    // If we passed all checks, proceed to the dashboard
+    return <Outlet />;
+
   } catch (err) {
+    // This catches malformed tokens or decoding errors
+    console.error("Security Token Error:", err);
     localStorage.clear();
     return <Navigate to="/login" replace />;
   }
-
-  return <Outlet />;
 };

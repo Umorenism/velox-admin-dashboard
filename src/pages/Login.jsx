@@ -631,45 +631,42 @@ export default function Login() {
       .fromTo(".input-animate", { y: 20, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, "-=0.5");
   }, []);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    setPasswordError(false);
-    setIdentifierError(false);
-    setIsLoading(true);
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setError('');
+  setIsLoading(true);
 
-    try {
-      const isEmail = identifier.includes('@');
-      const res = await login({ 
-        email: isEmail ? identifier : "", 
-        username: !isEmail ? identifier : "", 
-        password 
-      });
+  try {
+    const res = await login({ 
+      email: identifier.includes('@') ? identifier : "", 
+      username: !identifier.includes('@') ? identifier : "", 
+      password 
+    });
 
+    // 1. Extract Role
+    const role = res.user?.role?.toLowerCase();
+
+    // 2. THE GUARD: Only proceed if role is admin
+    if (role === 'admin' || role === 'superadmin') {
       localStorage.setItem('access_token', res.token);
       localStorage.setItem('admin_user', JSON.stringify(res.user));
-
-      const role = res.user?.role?.toLowerCase();
-      if (role === 'admin' || role === 'superadmin') {
-        navigate('/dashboard', { replace: true });
-      } else {
-        setError('Access Denied: Administrator clearance required.');
-        localStorage.clear();
-      }
-    } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Authentication failed.';
-      setError(errorMsg);
-
-      // ✅ Specific Field Error Handling
-      if (errorMsg === "Password is incorrect") {
-        setPasswordError(true);
-      } else if (errorMsg === "Email not found" || errorMsg.toLowerCase().includes("username not found") || errorMsg.toLowerCase().includes("user not found")) {
-        setIdentifierError(true);
-      }
-    } finally {
-      setIsLoading(false);
+      
+      // Navigate to dashboard ONLY for admins
+      navigate('/dashboard', { replace: true });
+    } else {
+      // 3. REJECT: If a regular user logs into the admin panel
+      setError('FORBIDDEN: You do not have administrative privileges.');
+      localStorage.clear(); 
     }
-  };
+    
+  } catch (err) {
+    const errorMsg = err.response?.data?.error || 'Authentication failed.';
+    setError(errorMsg);
+    // ... your field-specific error flags (passwordError, etc)
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 lg:p-8 font-sans text-slate-200">
