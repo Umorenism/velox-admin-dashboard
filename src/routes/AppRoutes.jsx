@@ -17,6 +17,8 @@ import Matrix from "../pages/network/Matrix";
 import Settings from "../pages/Dashboard/Settings";
 import NotFound from "../pages/Dashboard/NotFound";
 import ManageWithdrawal from "../utlis/ManageWithdrawal";
+import UserTransactions from "../pages/Dashboard/UserTransaction";
+import RebateManagement from "../pages/Dashboard/RebateManagement";
 
 export default function AppRouter() {
   return (
@@ -36,6 +38,8 @@ export default function AppRouter() {
           <Route path="withdrawal-management" element={<WithdrawalManagement/>} />
           <Route path="training" element={<CourseManager />} />
           <Route path="manage-withdrawals" element={<ManageWithdrawal />} />
+          <Route path="user-transactions" element={<UserTransactions />} />
+          <Route path="rebate-management" element={<RebateManagement />} />
 
           {/* Network Mapping Section */}
           <Route path="network/unilevel" element={<Unilevel />} />

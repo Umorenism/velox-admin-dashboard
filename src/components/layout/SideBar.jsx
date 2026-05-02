@@ -1185,11 +1185,17 @@ import {
   LayoutDashboard, Users, Crown, Wallet, CreditCard,
   Shield, LifeBuoy, LogOut, Search, X,
   ChevronDown, ChevronUp, GraduationCap, Network,
-  ShieldCheck, // Added for Withdrawal Management
-  UserCog     // Added for Admin profile feel
+  ShieldCheck,
+  UserCog,
+ 
+  Banknote, 
+  BookText, 
+  ArrowLeftRight, 
+  Coins, 
+ 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import logoimg from "../../assets/velox.svg";
+import logoimg from "../../assets/nvelox.png";
 import profilePic from "../../assets/profile.svg";
 
 const NavItem = ({ to, icon, label, onClick }) => (
@@ -1255,15 +1261,26 @@ export default function SideBar({ closeSidebar }) {
 
   // Admin-Specific Links
   const topLinks = [
-    { to: "/dashboard", label: "Admin Console", icon: <LayoutDashboard size={18} /> },
-    { to: "/dashboard/users", label: "User Directory", icon: <Users size={18} /> },
-    { to: "/dashboard/leaders", label: "Leader Oversight", icon: <Crown size={18} /> },
-    { to: "/dashboard/package", label: "System Wallets", icon: <Wallet size={18} /> },
-    { to: "/dashboard/manage-withdrawals", label: "Manage Withdrawals", icon: <Wallet size={18} /> },
-    { to: "/dashboard/transactions", label: "Global Ledger", icon: <CreditCard size={18} /> },
-    { to: "/dashboard/withdrawal-management", label: "Admin Frozen Control", icon: <ShieldCheck size={18} /> },
-    { to: "/dashboard/training", label: "Training Academy", icon: <GraduationCap size={18} /> },
-  ];
+  { to: "/dashboard", label: "Admin Console", icon: <LayoutDashboard size={18} /> },
+  { to: "/dashboard/users", label: "User Directory", icon: <Users size={18} /> },
+  { to: "/dashboard/leaders", label: "Leader Oversight", icon: <Crown size={18} /> },
+  { to: "/dashboard/package", label: "System Wallets", icon: <Wallet size={18} /> },
+  
+  // Changed to Banknote to distinguish from System Wallets
+  { to: "/dashboard/manage-withdrawals", label: "Manage Withdrawals", icon: <Banknote size={18} /> },
+  
+  // Changed to BookText (Ledger style)
+  { to: "/dashboard/transactions", label: "Global Ledger", icon: <BookText size={18} /> },
+  
+  // Changed to ArrowLeftRight to represent individual user movements
+  { to: "/dashboard/user-transactions", label: "User Transactions", icon: <ArrowLeftRight size={18} /> },
+  
+  // Changed to Coins to represent profit/loss distribution
+  { to: "/dashboard/rebate-management", label: "Rebate Management", icon: <Coins size={18} /> },
+  
+  { to: "/dashboard/withdrawal-management", label: "Admin Frozen Control", icon: <ShieldCheck size={18} /> },
+  { to: "/dashboard/training", label: "Training Academy", icon: <GraduationCap size={18} /> },
+];
 
   const dropdowns = [
     {
