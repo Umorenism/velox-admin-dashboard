@@ -102,12 +102,22 @@ export const ProtectedRoute = () => {
       return <Navigate to="/login" replace />;
     }
 
-    // 3. THE WALL: Strictly allow only admin or superadmin
-    const userRole = (decoded.role || "").toLowerCase();
-    const allowedRoles = ["admin", "superadmin"];
+    const normalizeRole = (value) => `${value || ''}`.toLowerCase().replace(/[_\s-]+/g, '');
+    const savedUser = (() => {
+      try {
+        return JSON.parse(localStorage.getItem('admin_user') || '{}');
+      } catch {
+        return {};
+      }
+    })();
+
+    const userRole = normalizeRole(
+      decoded.role || decoded.adminType || savedUser.role || savedUser.adminType || ''
+    );
+    const allowedRoles = ['admin', 'superadmin', 'network'];
 
     if (!allowedRoles.includes(userRole)) {
-      console.error("Access Denied: Role", userRole, "is not authorized.");
+      console.error('Access Denied: Role', userRole, 'is not authorized.');
       localStorage.clear(); 
       return <Navigate to="/login" replace />;
     }

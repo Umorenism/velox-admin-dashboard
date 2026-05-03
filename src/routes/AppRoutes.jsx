@@ -19,6 +19,9 @@ import NotFound from "../pages/Dashboard/NotFound";
 import ManageWithdrawal from "../utlis/ManageWithdrawal";
 import UserTransactions from "../pages/Dashboard/UserTransaction";
 import RebateManagement from "../pages/Dashboard/RebateManagement";
+import FundedUsers from "../pages/Dashboard/FundedUsers";
+import UserPackages from "../pages/Dashboard/UserPackages";
+import UserRankManagement from "../pages/Dashboard/UserRankManagement";
 
 export default function AppRouter() {
   return (
@@ -40,6 +43,9 @@ export default function AppRouter() {
           <Route path="manage-withdrawals" element={<ManageWithdrawal />} />
           <Route path="user-transactions" element={<UserTransactions />} />
           <Route path="rebate-management" element={<RebateManagement />} />
+          <Route path="funded-users" element={<FundedUsers />} />
+          <Route path="user-packages" element={<UserPackages />} />
+          <Route path="user-rank" element={<UserRankManagement />} />
 
           {/* Network Mapping Section */}
           <Route path="network/unilevel" element={<Unilevel />} />

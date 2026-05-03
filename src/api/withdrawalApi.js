@@ -22,35 +22,35 @@ export const getUsersForAdmin = async () => {
 };
 
 export const freezeUserWithdrawal = async (userId, reason) => {
-  const response = await apiClient.post('/api/admin/users/freeze-withdrawal', {
-    userId,
-    reason
-  });
+  const response = await apiClient.post(
+    `/api/admin/users/${userId}/freeze`,
+    { reason }
+  );
   return response.data;
 };
 
 export const unfreezeUserWithdrawal = async (userId) => {
-  const response = await apiClient.post('/api/admin/users/unfreeze-withdrawal', {
-    userId
-  });
+  const response = await apiClient.post(
+    `/api/admin/users/${userId}/freeze`
+  );
   return response.data;
 };
 
-
-
-
-// --- Restriction Endpoints ---
+// --- Restriction ---
 export const restrictUser = async (userId, reason) => {
-  const response = await apiClient.post('/api/admin/users/restrict', { userId, reason });
+  const response = await apiClient.post(
+    `/api/admin/users/${userId}/restrict`,
+    { reason }
+  );
   return response.data;
 };
 
 export const unrestrictUser = async (userId) => {
-  const response = await apiClient.post('/api/admin/users/unrestrict', { userId });
+  const response = await apiClient.post(
+    `/api/admin/users/${userId}/restrict`
+  );
   return response.data;
 };
-
-
 
 
 export const getAdminWithdrawals = async () => {
