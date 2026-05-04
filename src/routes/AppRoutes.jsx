@@ -22,6 +22,7 @@ import RebateManagement from "../pages/Dashboard/RebateManagement";
 import FundedUsers from "../pages/Dashboard/FundedUsers";
 import UserPackages from "../pages/Dashboard/UserPackages";
 import UserRankManagement from "../pages/Dashboard/UserRankManagement";
+import UnilevelDashboard from "../pages/Dashboard/UnilevelDashboard";
 
 export default function AppRouter() {
   return (
@@ -40,6 +41,7 @@ export default function AppRouter() {
           <Route path="transactions" element={<Transaction />} />
           <Route path="withdrawal-management" element={<WithdrawalManagement/>} />
           <Route path="training" element={<CourseManager />} />
+          <Route path="unilevel" element={<UnilevelDashboard />} />
           <Route path="manage-withdrawals" element={<ManageWithdrawal />} />
           <Route path="user-transactions" element={<UserTransactions />} />
           <Route path="rebate-management" element={<RebateManagement />} />

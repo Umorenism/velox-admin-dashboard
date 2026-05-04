@@ -27,28 +27,43 @@ export default function Dashboardpage() {
   const [loading, setLoading] = useState(true);
   const { closeSidebar } = useSidebar();
 
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      // Fetching actual live data from your endpoints
-      const [activeUsersRes, activeLeadersRes, financeRes] = await Promise.all([
-        apiClient.get("/api/admin/users/active/total"),
-        apiClient.get("/api/admin/leaders/active/total"),
-        apiClient.get("/api/admin/finance/summary").catch(() => ({ data: {} })) // Fallback for finance
-      ]);
+ const fetchStats = async () => {
+  try {
+    setLoading(true);
 
-      setStats({
-        totalActiveUsers: activeUsersRes.data?.totalActiveUsers || 0,
-        totalActiveLeaders: activeLeadersRes.data?.totalActiveLeaders || 0,
-        totalDeposits: financeRes.data?.totalDeposits || 0,
-        totalFreePackages: financeRes.data?.totalFreePackages || 0,
-      });
-    } catch (error) {
-      console.error("Data Sync Failed:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const usersRes = await apiClient.get("/api/admin/users");
+    const users = usersRes.data || [];
+
+    const totalActiveUsers = users.filter(
+      (user) => user.userState === "trading"
+    ).length;
+
+    const totalActiveLeaders = users.filter(
+      (user) => user.rank && user.rank !== "none"
+    ).length;
+
+    const totalDeposits = users.reduce(
+      (sum, user) => sum + (user.wallets?.deposit || 0),
+      0
+    );
+
+    const totalFreePackages = users.reduce(
+      (sum, user) => sum + (user.packages?.length || 0),
+      0
+    );
+
+    setStats({
+      totalActiveUsers,
+      totalActiveLeaders,
+      totalDeposits,
+      totalFreePackages,
+    });
+  } catch (error) {
+    console.error("Data Sync Failed:", error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchStats();
@@ -63,9 +78,8 @@ export default function Dashboardpage() {
       color: "emerald"
     },
     { 
-      title: "Free Package Volume", 
-      amount: stats.totalFreePackages, 
-      currency: "USD", 
+      title: "Total Active Package", 
+      amount: stats.totalFreePackages,  
       icon: <DollarSign size={18} className="text-blue-500" />,
       color: "blue"
     },

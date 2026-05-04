@@ -336,7 +336,7 @@ export default function SideBar({ closeSidebar }) {
       title: "Network Mapping",
       icon: <Network size={18} />,
       links: [
-        { to: "/dashboard/network/unilevel", label: "Unilevel View" },
+        { to: "/dashboard/unilevel", label: "Unilevel View" },
         // { to: "/dashboard/network/matrix", label: "Matrix View" },
       ],
     },
