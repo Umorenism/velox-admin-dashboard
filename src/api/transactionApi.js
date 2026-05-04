@@ -54,3 +54,11 @@ export const creditDailyRebate = async (rebateData) => {
     throw error.response?.data || error.message;
   }
 };
+
+
+export const getAllRebateTransactions = async () => {
+  const response = await apiClient.get(
+    "/api/admin/rebate/all-transactions"
+  );
+  return response.data;
+};
