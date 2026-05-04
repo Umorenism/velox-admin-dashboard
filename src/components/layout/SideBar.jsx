@@ -321,7 +321,7 @@ export default function SideBar({ closeSidebar }) {
     { to: "/dashboard/leaders", label: "Leader Oversight", icon: <Crown size={18} /> },
     { to: "/dashboard/package", label: "Package Management", icon: <Wallet size={18} /> },
     { to: "/dashboard/manage-withdrawals", label: "Manage Withdrawals", icon: <Banknote size={18} /> },
-    { to: "/dashboard/transactions", label: "Global Ledger", icon: <BookText size={18} /> },
+    // { to: "/dashboard/transactions", label: "Global Ledger", icon: <BookText size={18} /> },
     { to: "/dashboard/user-transactions", label: "User Transactions", icon: <ArrowLeftRight size={18} /> },
     { to: "/dashboard/funded-users", label: "Funded Users", icon: <Users size={18} /> },
     { to: "/dashboard/user-packages", label: "User Packages", icon: <Package size={18} /> },
