@@ -13,7 +13,7 @@ import Transaction from "../pages/Dashboard/Transaction";
 import WithdrawalManagement from "../utlis/WithdrawalManagement";
 import CourseManager from "../pages/academy/CourseManager";
 import Unilevel from "../pages/network/Unilevel";
-import Matrix from "../pages/network/Matrix";
+// import Matrix from "../pages/network/Matrix";
 import Settings from "../pages/Dashboard/Settings";
 import NotFound from "../pages/Dashboard/NotFound";
 import ManageWithdrawal from "../utlis/ManageWithdrawal";
@@ -49,7 +49,7 @@ export default function AppRouter() {
 
           {/* Network Mapping Section */}
           <Route path="network/unilevel" element={<Unilevel />} />
-          <Route path="network/matrix" element={<Matrix />} />
+          {/* <Route path="network/matrix" element={<Matrix />} /> */}
 
           {/* Security Settings Section */}
           <Route path="settings" element={<Settings />} />

@@ -337,7 +337,7 @@ export default function SideBar({ closeSidebar }) {
       icon: <Network size={18} />,
       links: [
         { to: "/dashboard/network/unilevel", label: "Unilevel View" },
-        { to: "/dashboard/network/matrix", label: "Matrix View" },
+        // { to: "/dashboard/network/matrix", label: "Matrix View" },
       ],
     },
   ];
