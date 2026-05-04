@@ -68,8 +68,9 @@ export const getPackages = async () => {
 
 // ✅ Activate package
 export const activateUserPackage = async (userId, packageId) => {
-  return await apiClient.post(`/api/admin/users/activate-package`, { 
-    userId,    
+  // Use a template literal to inject the dynamic userId into the URL
+  return await apiClient.post(`/api/admin/users/${userId}/package/grant`, { 
+    userId,     
     packageId 
   });
 };

@@ -30,7 +30,7 @@ export const freezeUserWithdrawal = async (userId, reason) => {
 };
 
 export const unfreezeUserWithdrawal = async (userId) => {
-  const response = await apiClient.post(
+  const response = await apiClient.delete(
     `/api/admin/users/${userId}/freeze`
   );
   return response.data;
@@ -46,7 +46,7 @@ export const restrictUser = async (userId, reason) => {
 };
 
 export const unrestrictUser = async (userId) => {
-  const response = await apiClient.post(
+  const response = await apiClient.delete(
     `/api/admin/users/${userId}/restrict`
   );
   return response.data;

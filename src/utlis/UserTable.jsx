@@ -785,28 +785,616 @@
 
 
 
+// import React, { useState, useMemo, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { 
+//   activateUserPackage, fundUserPackage, getPackages, deductUserWallet 
+// } from "../api/userApi";
+// import { 
+//   freezeUserWithdrawal, unfreezeUserWithdrawal, restrictUser, unrestrictUser 
+// } from "../api/withdrawalApi";
+// import { 
+//   Loader2, Zap, DollarSign, PackageCheck, CheckCircle2, AlertCircle,
+//   MinusCircle, ShieldAlert, Lock, Unlock, Ban, UserCheck, Trash2,
+//   ChevronLeft, ChevronRight
+// } from "lucide-react";
+
+// const UserTable = ({ 
+//   users = [], 
+//   loading, 
+//   searchTerm, 
+//   filter, 
+//   entriesPerPage, 
+//   currentPage, 
+//   setCurrentPage, // Added this prop
+//   onRefresh 
+// }) => {
+//   const [openModal, setOpenModal] = useState(false);
+//   const [modalType, setModalType] = useState(""); 
+//   const [selectedUser, setSelectedUser] = useState(null);
+//   const [actionLoading, setActionLoading] = useState(false);
+  
+//   const [fundAmount, setFundAmount] = useState("");
+//   const [deductRemark, setDeductRemark] = useState("");
+//   const [selectedPackageId, setSelectedPackageId] = useState("");
+  
+//   const [dbPackages, setDbPackages] = useState([]);
+//   const [notification, setNotification] = useState({ show: false, type: "", message: "" });
+
+//   useEffect(() => {
+//     const fetchPkgs = async () => {
+//       try {
+//         const data = await getPackages();
+//         setDbPackages(data);
+//       } catch (err) { console.error(err); }
+//     };
+//     fetchPkgs();
+//   }, []);
+
+//   const triggerNotification = (type, message) => {
+//     setNotification({ show: true, type, message });
+//     setTimeout(() => {
+//       setNotification({ show: false, type: "", message: "" });
+//       if (type === "success") handleCloseModal();
+//     }, 3000);
+//   };
+
+//   const handleCloseModal = () => {
+//     if (actionLoading) return;
+//     setOpenModal(false);
+//     setSelectedUser(null);
+//     setFundAmount("");
+//     setDeductRemark("");
+//   };
+
+//   const handleAction = async (actionFn, defaultSuccessMsg) => {
+//     try {
+//       setActionLoading(true);
+//       const response = await actionFn();
+//       triggerNotification("success", response.data?.message || defaultSuccessMsg);
+//       onRefresh(); 
+//     } catch (err) {
+//       triggerNotification("error", err.response?.data?.message || "Operation Failed");
+//     } finally {
+//       setActionLoading(false);
+//     }
+//   };
+
+//   const filteredUsers = useMemo(() => {
+//     const q = searchTerm.toLowerCase().trim();
+//     return users.filter((u) => {
+//       const match = [u.name, u.email, u.userName].some(f => f?.toLowerCase().includes(q));
+//       return match && (filter === "All" || u.role?.toLowerCase() === filter.toLowerCase());
+//     });
+//   }, [users, searchTerm, filter]);
+
+//   // PAGINATION LOGIC
+//   const totalPages = Math.ceil(filteredUsers.length / entriesPerPage);
+//   const paginatedUsers = filteredUsers.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
+
+//   const handlePrev = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+//   const handleNext = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+
+//   return (
+//     <div className="bg-white dark:bg-[#080d1a] border border-slate-200 dark:border-white/5 rounded-[2rem] shadow-2xl overflow-hidden font-sans">
+//       <div className="overflow-x-auto">
+//         <table className="w-full text-left border-separate border-spacing-0">
+//           <thead>
+//             <tr className="bg-slate-50/50 dark:bg-white/[0.02]">
+//               {["Member Info", "Status", "Command Center"].map((h) => (
+//                 <th key={h} className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-white/5">{h}</th>
+//               ))}
+//             </tr>
+//           </thead>
+//           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
+//             {paginatedUsers.length > 0 ? (
+//               paginatedUsers.map((u) => (
+//                 <tr key={u._id} className="group hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all">
+//                   <td className="px-8 py-5">
+//                     <div className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-tight">{u.name}</div>
+//                     <div className="text-[10px] text-slate-400 mt-0.5 lowercase font-medium opacity-60">{u.email}</div>
+//                   </td>
+//                   <td className="px-8 py-5">
+//                     <div className="flex flex-wrap gap-2">
+//                       <StatusBadge active={!u.withdrawalFrozen} label="Payout" />
+//                       <StatusBadge active={!u.adminFrozen} label="Access" color="amber" />
+//                     </div>
+//                   </td>
+//                   <td className="px-8 py-5">
+//                     <div className="flex items-center gap-2">
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("activate"); setSelectedPackageId(dbPackages[0]?._id); setOpenModal(true); }}
+//                          icon={<Zap size={14} />} label="Activate" color="emerald" 
+//                       />
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("fund"); setOpenModal(true); }}
+//                          icon={<DollarSign size={14} />} label="Fund" color="blue" 
+//                       />
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("restrict"); setOpenModal(true); }}
+//                          icon={u.adminFrozen ? <UserCheck size={14} /> : <Ban size={14} />} 
+//                          label={u.adminFrozen ? "Restore" : "Restrict"} 
+//                          color={u.adminFrozen ? "emerald" : "amber"} 
+//                       />
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("deduct"); setOpenModal(true); }}
+//                          icon={<MinusCircle size={14} />} label="Deduct" color="rose" 
+//                       />
+//                     </div>
+//                   </td>
+//                 </tr>
+//               ))
+//             ) : (
+//               <tr>
+//                 <td colSpan="3" className="px-8 py-20 text-center text-slate-400 text-xs font-black uppercase tracking-widest italic opacity-40">
+//                   No Users Found in the Directory
+//                 </td>
+//               </tr>
+//             )}
+//           </tbody>
+//         </table>
+//       </div>
+
+//       {/* --- PAGINATION FOOTER --- */}
+//       <div className="px-8 py-6 bg-slate-50/30 dark:bg-white/[0.01] border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+//         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center sm:text-left">
+//           Showing <span className="text-slate-900 dark:text-white">{paginatedUsers.length}</span> of {filteredUsers.length} Members
+//         </div>
+
+//         <div className="flex items-center gap-2">
+//           <button 
+//             onClick={handlePrev}
+//             disabled={currentPage === 1}
+//             className="p-2.5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-400 hover:bg-white dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+//           >
+//             <ChevronLeft size={16} />
+//           </button>
+
+//           <div className="flex items-center gap-1.5">
+//             {[...Array(totalPages)].map((_, i) => (
+//               <button
+//                 key={i}
+//                 onClick={() => setCurrentPage(i + 1)}
+//                 className={`w-9 h-9 rounded-xl text-[10px] font-black transition-all ${
+//                   currentPage === i + 1 
+//                     ? "bg-slate-900 dark:bg-white text-white dark:text-black shadow-xl" 
+//                     : "text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
+//                 }`}
+//               >
+//                 {i + 1}
+//               </button>
+//             )).slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))}
+//           </div>
+
+//           <button 
+//             onClick={handleNext}
+//             disabled={currentPage === totalPages || totalPages === 0}
+//             className="p-2.5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-400 hover:bg-white dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+//           >
+//             <ChevronRight size={16} />
+//           </button>
+//         </div>
+//       </div>
+
+//       <AnimatePresence>
+//         {openModal && selectedUser && (
+//           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+//             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={handleCloseModal} className="absolute inset-0 bg-[#050810]/90 backdrop-blur-xl" />
+            
+//             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-white dark:bg-[#0f172a] rounded-[3rem] p-10 shadow-3xl border border-white/5 overflow-hidden text-center">
+              
+//               {notification.show && (
+//                 <div className={`absolute top-0 left-0 right-0 p-4 text-[10px] font-black uppercase tracking-widest ${notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+//                   {notification.message}
+//                 </div>
+//               )}
+
+//               <div className="mb-8 flex flex-col items-center">
+//                 <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-2xl ${
+//                   modalType === 'activate' ? 'bg-emerald-500' : 
+//                   modalType === 'fund' ? 'bg-blue-600' : 
+//                   modalType === 'restrict' ? 'bg-amber-500' : 'bg-rose-600'
+//                 } text-white`}>
+//                   {modalType === 'activate' ? <PackageCheck size={32} /> : modalType === 'fund' ? <DollarSign size={32} /> : modalType === 'restrict' ? <ShieldAlert size={32} /> : <MinusCircle size={32} />}
+//                 </div>
+//                 <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+//                   {modalType.toUpperCase()} USER
+//                 </h3>
+//                 <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{selectedUser.email}</p>
+//               </div>
+
+//               <div className="mb-10 text-left">
+//                 {modalType === "restrict" ? (
+//                   <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-[2rem] border border-dashed border-slate-200 dark:border-white/10">
+//                     <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed font-medium">
+//                       {selectedUser.adminFrozen 
+//                         ? "Restoring access will allow the user to log in and use all platform features immediately."
+//                         : "Restricting access will terminate current sessions and prevent the user from logging back in."}
+//                     </p>
+//                     {!selectedUser.adminFrozen && (
+//                       <input 
+//                         type="text" 
+//                         placeholder="Reason for restriction..." 
+//                         className="w-full bg-white dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none ring-1 ring-slate-200 dark:ring-white/5" 
+//                         onChange={(e) => setDeductRemark(e.target.value)}
+//                       />
+//                     )}
+//                   </div>
+//                 ) : modalType === "activate" ? (
+//                   <div className="space-y-2">
+//                     <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Select Plan</label>
+//                     <select value={selectedPackageId} onChange={(e) => setSelectedPackageId(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-5 py-4 text-sm font-bold dark:text-white outline-none">
+//                       {dbPackages.map((pkg) => <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>)}
+//                     </select>
+//                   </div>
+//                 ) : (
+//                   <div className="space-y-4">
+//                     <div className="space-y-2">
+//                       <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Amount (USD)</label>
+//                       <input type="number" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} placeholder="0.00" className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-6 py-5 text-2xl font-black dark:text-white outline-none" />
+//                     </div>
+//                     {modalType === "deduct" && (
+//                       <input type="text" value={deductRemark} onChange={(e) => setDeductRemark(e.target.value)} placeholder="Deduction Remark..." className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-4 py-3 text-sm font-bold dark:text-white outline-none" />
+//                     )}
+//                   </div>
+//                 )}
+//               </div>
+
+//               <button
+//                 onClick={() => {
+//                   const uId = selectedUser._id;
+//                   if (modalType === 'activate') handleAction(() => activateUserPackage(uId, selectedPackageId), "Provisioned");
+//                   else if (modalType === 'fund') handleAction(() => fundUserPackage(uId, { amount: fundAmount }), "Capitalized");
+//                   else if (modalType === 'deduct') handleAction(() => deductUserWallet(uId, { amount: fundAmount, remark: deductRemark }), "Debited");
+//                   else if (modalType === 'restrict') {
+//                     selectedUser.adminFrozen ? handleAction(() => unrestrictUser(uId), "Restored") : handleAction(() => restrictUser(uId, deductRemark || "Admin Action"), "Restricted");
+//                   }
+//                 }}
+//                 disabled={actionLoading}
+//                 className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all active:scale-95 shadow-2xl ${
+//                   modalType === 'restrict' ? 'bg-amber-500 text-white' : 
+//                   modalType === 'deduct' ? 'bg-rose-600 text-white' : 
+//                   modalType === 'fund' ? 'bg-blue-600 text-white' : 'bg-slate-900 dark:bg-white text-white dark:text-black'
+//                 }`}
+//               >
+//                 {actionLoading ? <Loader2 className="animate-spin mx-auto" size={18} /> : "Confirm Action"}
+//               </button>
+              
+//               <button onClick={handleCloseModal} className="mt-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Abort Mission</button>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// /* Internal UI Helpers */
+// const ActionBtn = ({ onClick, icon, label, color }) => (
+//   <button 
+//     onClick={onClick} 
+//     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all 
+//       ${color === 'emerald' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500' : ''}
+//       ${color === 'blue' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500' : ''}
+//       ${color === 'amber' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500' : ''}
+//       ${color === 'rose' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500' : ''}
+//       hover:text-white hover:shadow-lg active:scale-90`}
+//   >
+//     {icon} <span>{label}</span>
+//   </button>
+// );
+
+// const StatusBadge = ({ active, label, color = "emerald" }) => (
+//   <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider 
+//     ${active ? `bg-emerald-500/10 text-emerald-500` : `bg-rose-500/10 text-rose-500`}`}>
+//     <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+//     {label}: {active ? "OK" : "NO"}
+//   </div>
+// );
+
+// export default UserTable;
+
+
+
+
+
+
+
+
+// import React, { useState, useMemo, useEffect } from "react";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { 
+//   activateUserPackage, fundUserPackage, getPackages, deductUserWallet 
+// } from "../api/userApi";
+// import { 
+//   restrictUser, unrestrictUser 
+// } from "../api/withdrawalApi";
+// import { 
+//   Loader2, Zap, DollarSign, PackageCheck, MinusCircle, 
+//   ShieldAlert, Ban, UserCheck, ChevronLeft, ChevronRight, 
+//   Calendar, User, MessageSquare
+// } from "lucide-react";
+
+// const UserTable = ({ 
+//   users = [], 
+//   searchTerm, 
+//   filter, 
+//   entriesPerPage, 
+//   currentPage, 
+//   setCurrentPage,
+//   onRefresh 
+// }) => {
+//   const [openModal, setOpenModal] = useState(false);
+//   const [modalType, setModalType] = useState(""); 
+//   const [selectedUser, setSelectedUser] = useState(null);
+//   const [actionLoading, setActionLoading] = useState(false);
+  
+//   const [fundAmount, setFundAmount] = useState("");
+//   const [reason, setReason] = useState(""); 
+//   const [selectedPackageId, setSelectedPackageId] = useState("");
+  
+//   const [dbPackages, setDbPackages] = useState([]);
+//   const [notification, setNotification] = useState({ show: false, type: "", message: "" });
+
+//   useEffect(() => {
+//     const fetchPkgs = async () => {
+//       try {
+//         const data = await getPackages();
+//         setDbPackages(data);
+//         if (data.length > 0) setSelectedPackageId(data[0]._id);
+//       } catch (err) { console.error(err); }
+//     };
+//     fetchPkgs();
+//   }, []);
+
+//   const handleCloseModal = () => {
+//     if (actionLoading) return;
+//     setOpenModal(false);
+//     setSelectedUser(null);
+//     setFundAmount("");
+//     setReason("");
+//     setModalType("");
+//   };
+
+//   const triggerNotification = (type, message) => {
+//     setNotification({ show: true, type, message });
+//     setTimeout(() => setNotification({ show: false, type: "", message: "" }), 3000);
+//   };
+
+//   const handleAction = async (actionFn, successMsg) => {
+//     try {
+//       setActionLoading(true);
+//       await actionFn();
+      
+//       // Close modal immediately on success
+//       handleCloseModal();
+      
+//       // Notify and Refresh data
+//       triggerNotification("success", successMsg);
+//       onRefresh(); 
+//     } catch (err) {
+//       triggerNotification("error", err.response?.data?.message || "Operation Failed");
+//     } finally {
+//       setActionLoading(false);
+//     }
+//   };
+
+//   const filteredUsers = useMemo(() => {
+//     const q = searchTerm.toLowerCase().trim();
+//     return users.filter((u) => {
+//       const match = [u.name, u.email, u.userName].some(f => f?.toLowerCase().includes(q));
+//       return match && (filter === "All" || u.role?.toLowerCase() === filter.toLowerCase());
+//     });
+//   }, [users, searchTerm, filter]);
+
+//   const totalPages = Math.ceil(filteredUsers.length / entriesPerPage);
+//   const paginatedUsers = filteredUsers.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
+
+//   return (
+//     <div className="bg-white dark:bg-[#080d1a] border border-slate-200 dark:border-white/5 rounded-[2rem] shadow-2xl overflow-hidden font-sans">
+//       <div className="overflow-x-auto">
+//         <table className="w-full text-left border-separate border-spacing-0">
+//           <thead>
+//             <tr className="bg-slate-50/50 dark:bg-white/[0.02]">
+//               {["Member Info", "Account Status", "Actions"].map((h) => (
+//                 <th key={h} className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-white/5">{h}</th>
+//               ))}
+//             </tr>
+//           </thead>
+//           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
+//             {paginatedUsers.map((u) => {
+//               const isRestricted = u.restrictionStatus?.isRestricted;
+//               return (
+//                 <tr key={u._id} className="group hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all">
+//                   <td className="px-8 py-5">
+//                     <div className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-tight">{u.name}</div>
+//                     <div className="text-[10px] text-slate-400 mt-0.5 lowercase font-medium opacity-60">{u.email}</div>
+//                   </td>
+//                   <td className="px-8 py-5">
+//                     <div className="flex flex-col gap-2">
+//                       <StatusBadge active={!isRestricted} label="Status" />
+//                       {isRestricted && (
+//                         <div className="flex flex-col gap-1 p-3 bg-rose-500/5 rounded-2xl border border-rose-500/10">
+//                           <div className="text-[9px] text-rose-500 font-black uppercase flex items-center gap-1.5">
+//                             <MessageSquare size={10}/> {u.restrictionStatus.reason}
+//                           </div>
+//                           <div className="flex items-center gap-3 mt-1 opacity-70">
+//                             <div className="text-[8px] text-slate-400 uppercase font-bold flex items-center gap-1">
+//                               <User size={8}/> {u.restrictionStatus.restrictedBy?.adminName}
+//                             </div>
+//                             <div className="text-[8px] text-slate-400 uppercase font-bold flex items-center gap-1">
+//                               <Calendar size={8}/> {new Date(u.restrictionStatus.restrictedDate).toLocaleDateString()}
+//                             </div>
+//                           </div>
+//                         </div>
+//                       )}
+//                     </div>
+//                   </td>
+//                   <td className="px-8 py-5">
+//                     <div className="flex items-center gap-2">
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("activate"); setOpenModal(true); }}
+//                          icon={<Zap size={14} />} label="Activate" color="emerald" 
+//                       />
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("restrict"); setOpenModal(true); }}
+//                          icon={isRestricted ? <UserCheck size={14} /> : <Ban size={14} />} 
+//                          label={isRestricted ? "Unrestrict" : "Restrict"} 
+//                          color={isRestricted ? "emerald" : "amber"} 
+//                       />
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("fund"); setOpenModal(true); }}
+//                          icon={<DollarSign size={14} />} label="Fund" color="blue" 
+//                       />
+//                       <ActionBtn 
+//                          onClick={() => { setSelectedUser(u); setModalType("deduct"); setOpenModal(true); }}
+//                          icon={<MinusCircle size={14} />} label="Deduct" color="rose" 
+//                       />
+//                     </div>
+//                   </td>
+//                 </tr>
+//               );
+//             })}
+//           </tbody>
+//         </table>
+//       </div>
+
+//       {/* Action Notification Overlay */}
+//       <AnimatePresence>
+//         {notification.show && (
+//           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} className={`fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl z-[110] shadow-2xl font-black text-[10px] uppercase tracking-widest ${notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+//             {notification.message}
+//           </motion.div>
+//         )}
+//       </AnimatePresence>
+
+//       <AnimatePresence>
+//         {openModal && selectedUser && (
+//           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+//             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={handleCloseModal} className="absolute inset-0 bg-[#050810]/90 backdrop-blur-xl" />
+//             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-white dark:bg-[#0f172a] rounded-[3rem] p-10 shadow-3xl border border-white/5 overflow-hidden text-center">
+              
+//               <div className="mb-8 flex flex-col items-center">
+//                 <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-2xl ${
+//                   modalType === 'restrict' ? (selectedUser.restrictionStatus?.isRestricted ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-slate-900 dark:bg-white'
+//                 } text-white dark:text-black`}>
+//                   {modalType === 'restrict' ? (selectedUser.restrictionStatus?.isRestricted ? <UserCheck size={32} /> : <ShieldAlert size={32} />) : <PackageCheck size={32} />}
+//                 </div>
+//                 <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+//                   {modalType === "restrict" ? (selectedUser.restrictionStatus?.isRestricted ? "UNRESTRICT" : "RESTRICT") : modalType} USER
+//                 </h3>
+//               </div>
+
+//               <div className="mb-10 text-left">
+//                 {modalType === "restrict" ? (
+//                   <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-[2rem] border border-dashed border-slate-200 dark:border-white/10 text-center">
+//                     <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 font-bold">
+//                       {selectedUser.restrictionStatus?.isRestricted 
+//                         ? "Do you want to unrestrict this user account?" 
+//                         : "Please provide a reason for this restriction."}
+//                     </p>
+//                     {!selectedUser.restrictionStatus?.isRestricted && (
+//                       <input 
+//                         type="text" 
+//                         value={reason}
+//                         placeholder="Reason..." 
+//                         className="w-full bg-white dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none ring-1 ring-slate-200 dark:ring-white/5" 
+//                         onChange={(e) => setReason(e.target.value)}
+//                       />
+//                     )}
+//                   </div>
+//                 ) : modalType === "activate" ? (
+//                   <select value={selectedPackageId} onChange={(e) => setSelectedPackageId(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-5 py-4 text-sm font-bold dark:text-white outline-none">
+//                     {dbPackages.map((pkg) => <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>)}
+//                   </select>
+//                 ) : (
+//                   <input type="number" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} placeholder="Amount (USD)" className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-6 py-5 text-xl font-black dark:text-white outline-none" />
+//                 )}
+//               </div>
+
+//               <button
+//                 onClick={() => {
+//                   const uId = selectedUser._id;
+//                   if (modalType === 'restrict') {
+//                     selectedUser.restrictionStatus?.isRestricted 
+//                       ? handleAction(() => unrestrictUser(uId), "Access Restored") 
+//                       : handleAction(() => restrictUser(uId, reason), "User Restricted");
+//                   } else if (modalType === 'activate') {
+//                     handleAction(() => activateUserPackage(uId, selectedPackageId), "Package Activated");
+//                   } else if (modalType === 'fund') {
+//                     handleAction(() => fundUserPackage(uId, { amount: fundAmount }), "Capitalized");
+//                   } else if (modalType === 'deduct') {
+//                     handleAction(() => deductUserWallet(uId, { amount: fundAmount, remark: "Admin Action" }), "Debited");
+//                   }
+//                 }}
+//                 disabled={actionLoading || (modalType === 'restrict' && !selectedUser.restrictionStatus?.isRestricted && !reason)}
+//                 className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all active:scale-95 ${
+//                   actionLoading ? "bg-slate-400" : "bg-slate-900 dark:bg-white text-white dark:text-black"
+//                 }`}
+//               >
+//                 {actionLoading ? <Loader2 className="animate-spin mx-auto" size={18} /> : "Confirm Action"}
+//               </button>
+              
+//               <button onClick={handleCloseModal} className="mt-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors">Abort</button>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// const ActionBtn = ({ onClick, icon, label, color }) => (
+//   <button 
+//     onClick={onClick} 
+//     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all 
+//       ${color === 'emerald' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500' : ''}
+//       ${color === 'blue' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500' : ''}
+//       ${color === 'amber' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500' : ''}
+//       ${color === 'rose' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500' : ''}
+//       hover:text-white hover:shadow-lg active:scale-90`}
+//   >
+//     {icon} <span>{label}</span>
+//   </button>
+// );
+
+// const StatusBadge = ({ active, label }) => (
+//   <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider w-fit
+//     ${active ? `bg-emerald-500/10 text-emerald-500` : `bg-rose-500/10 text-rose-500`}`}>
+//     <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+//     {label}: {active ? "Active" : "Restricted"}
+//   </div>
+// );
+
+// export default UserTable;
+
+
+
+
+
+
+
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   activateUserPackage, fundUserPackage, getPackages, deductUserWallet 
 } from "../api/userApi";
 import { 
-  freezeUserWithdrawal, unfreezeUserWithdrawal, restrictUser, unrestrictUser 
+  restrictUser, unrestrictUser 
 } from "../api/withdrawalApi";
 import { 
-  Loader2, Zap, DollarSign, PackageCheck, CheckCircle2, AlertCircle,
-  MinusCircle, ShieldAlert, Lock, Unlock, Ban, UserCheck, Trash2,
-  ChevronLeft, ChevronRight
+  Loader2, Zap, DollarSign, PackageCheck, MinusCircle, 
+  ShieldAlert, Ban, UserCheck, ChevronLeft, ChevronRight, 
+  Calendar, User, MessageSquare
 } from "lucide-react";
 
 const UserTable = ({ 
   users = [], 
-  loading, 
   searchTerm, 
   filter, 
   entriesPerPage, 
   currentPage, 
-  setCurrentPage, // Added this prop
+  setCurrentPage,
   onRefresh 
 }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -815,7 +1403,7 @@ const UserTable = ({
   const [actionLoading, setActionLoading] = useState(false);
   
   const [fundAmount, setFundAmount] = useState("");
-  const [deductRemark, setDeductRemark] = useState("");
+  const [reason, setReason] = useState(""); 
   const [selectedPackageId, setSelectedPackageId] = useState("");
   
   const [dbPackages, setDbPackages] = useState([]);
@@ -826,32 +1414,32 @@ const UserTable = ({
       try {
         const data = await getPackages();
         setDbPackages(data);
+        if (data.length > 0) setSelectedPackageId(data[0]._id);
       } catch (err) { console.error(err); }
     };
     fetchPkgs();
   }, []);
-
-  const triggerNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(() => {
-      setNotification({ show: false, type: "", message: "" });
-      if (type === "success") handleCloseModal();
-    }, 3000);
-  };
 
   const handleCloseModal = () => {
     if (actionLoading) return;
     setOpenModal(false);
     setSelectedUser(null);
     setFundAmount("");
-    setDeductRemark("");
+    setReason("");
+    setModalType("");
   };
 
-  const handleAction = async (actionFn, defaultSuccessMsg) => {
+  const triggerNotification = (type, message) => {
+    setNotification({ show: true, type, message });
+    setTimeout(() => setNotification({ show: false, type: "", message: "" }), 3000);
+  };
+
+  const handleAction = async (actionFn, successMsg) => {
     try {
       setActionLoading(true);
-      const response = await actionFn();
-      triggerNotification("success", response.data?.message || defaultSuccessMsg);
+      await actionFn();
+      handleCloseModal();
+      triggerNotification("success", successMsg);
       onRefresh(); 
     } catch (err) {
       triggerNotification("error", err.response?.data?.message || "Operation Failed");
@@ -868,12 +1456,8 @@ const UserTable = ({
     });
   }, [users, searchTerm, filter]);
 
-  // PAGINATION LOGIC
   const totalPages = Math.ceil(filteredUsers.length / entriesPerPage);
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
-
-  const handlePrev = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-  const handleNext = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="bg-white dark:bg-[#080d1a] border border-slate-200 dark:border-white/5 rounded-[2rem] shadow-2xl overflow-hidden font-sans">
@@ -881,40 +1465,55 @@ const UserTable = ({
         <table className="w-full text-left border-separate border-spacing-0">
           <thead>
             <tr className="bg-slate-50/50 dark:bg-white/[0.02]">
-              {["Member Info", "Status", "Command Center"].map((h) => (
+              {["Member Info", "Account Status", "Actions"].map((h) => (
                 <th key={h} className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-white/5">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
-            {paginatedUsers.length > 0 ? (
-              paginatedUsers.map((u) => (
+            {paginatedUsers.map((u) => {
+              const isRestricted = u.restrictionStatus?.isRestricted;
+              return (
                 <tr key={u._id} className="group hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-all">
                   <td className="px-8 py-5">
                     <div className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-tight">{u.name}</div>
                     <div className="text-[10px] text-slate-400 mt-0.5 lowercase font-medium opacity-60">{u.email}</div>
                   </td>
                   <td className="px-8 py-5">
-                    <div className="flex flex-wrap gap-2">
-                      <StatusBadge active={!u.withdrawalFrozen} label="Payout" />
-                      <StatusBadge active={!u.adminFrozen} label="Access" color="amber" />
+                    <div className="flex flex-col gap-2">
+                      <StatusBadge active={!isRestricted} label="Status" />
+                      {isRestricted && (
+                        <div className="flex flex-col gap-1 p-3 bg-rose-500/5 rounded-2xl border border-rose-500/10">
+                          <div className="text-[9px] text-rose-500 font-black uppercase flex items-center gap-1.5">
+                            <MessageSquare size={10}/> {u.restrictionStatus.reason}
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 opacity-70">
+                            <div className="text-[8px] text-slate-400 uppercase font-bold flex items-center gap-1">
+                              <User size={8}/> {u.restrictionStatus.restrictedBy?.adminName}
+                            </div>
+                            <div className="text-[8px] text-slate-400 uppercase font-bold flex items-center gap-1">
+                              <Calendar size={8}/> {new Date(u.restrictionStatus.restrictedDate).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-2">
                       <ActionBtn 
-                         onClick={() => { setSelectedUser(u); setModalType("activate"); setSelectedPackageId(dbPackages[0]?._id); setOpenModal(true); }}
+                         onClick={() => { setSelectedUser(u); setModalType("activate"); setOpenModal(true); }}
                          icon={<Zap size={14} />} label="Activate" color="emerald" 
+                      />
+                      <ActionBtn 
+                         onClick={() => { setSelectedUser(u); setModalType("restrict"); setOpenModal(true); }}
+                         icon={isRestricted ? <UserCheck size={14} /> : <Ban size={14} />} 
+                         label={isRestricted ? "Unrestrict" : "Restrict"} 
+                         color={isRestricted ? "emerald" : "amber"} 
                       />
                       <ActionBtn 
                          onClick={() => { setSelectedUser(u); setModalType("fund"); setOpenModal(true); }}
                          icon={<DollarSign size={14} />} label="Fund" color="blue" 
-                      />
-                      <ActionBtn 
-                         onClick={() => { setSelectedUser(u); setModalType("restrict"); setOpenModal(true); }}
-                         icon={u.adminFrozen ? <UserCheck size={14} /> : <Ban size={14} />} 
-                         label={u.adminFrozen ? "Restore" : "Restrict"} 
-                         color={u.adminFrozen ? "emerald" : "amber"} 
                       />
                       <ActionBtn 
                          onClick={() => { setSelectedUser(u); setModalType("deduct"); setOpenModal(true); }}
@@ -923,144 +1522,88 @@ const UserTable = ({
                     </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="px-8 py-20 text-center text-slate-400 text-xs font-black uppercase tracking-widest italic opacity-40">
-                  No Users Found in the Directory
-                </td>
-              </tr>
-            )}
+              );
+            })}
           </tbody>
         </table>
       </div>
 
-      {/* --- PAGINATION FOOTER --- */}
-      <div className="px-8 py-6 bg-slate-50/30 dark:bg-white/[0.01] border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center sm:text-left">
-          Showing <span className="text-slate-900 dark:text-white">{paginatedUsers.length}</span> of {filteredUsers.length} Members
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={handlePrev}
-            disabled={currentPage === 1}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-400 hover:bg-white dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all"
-          >
-            <ChevronLeft size={16} />
-          </button>
-
-          <div className="flex items-center gap-1.5">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`w-9 h-9 rounded-xl text-[10px] font-black transition-all ${
-                  currentPage === i + 1 
-                    ? "bg-slate-900 dark:bg-white text-white dark:text-black shadow-xl" 
-                    : "text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
-                }`}
-              >
-                {i + 1}
-              </button>
-            )).slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))}
-          </div>
-
-          <button 
-            onClick={handleNext}
-            disabled={currentPage === totalPages || totalPages === 0}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-400 hover:bg-white dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
+      <AnimatePresence>
+        {notification.show && (
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} className={`fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl z-[110] shadow-2xl font-black text-[10px] uppercase tracking-widest ${notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+            {notification.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {openModal && selectedUser && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={handleCloseModal} className="absolute inset-0 bg-[#050810]/90 backdrop-blur-xl" />
-            
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-white dark:bg-[#0f172a] rounded-[3rem] p-10 shadow-3xl border border-white/5 overflow-hidden text-center">
               
-              {notification.show && (
-                <div className={`absolute top-0 left-0 right-0 p-4 text-[10px] font-black uppercase tracking-widest ${notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
-                  {notification.message}
-                </div>
-              )}
-
               <div className="mb-8 flex flex-col items-center">
                 <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-2xl ${
-                  modalType === 'activate' ? 'bg-emerald-500' : 
-                  modalType === 'fund' ? 'bg-blue-600' : 
-                  modalType === 'restrict' ? 'bg-amber-500' : 'bg-rose-600'
-                } text-white`}>
-                  {modalType === 'activate' ? <PackageCheck size={32} /> : modalType === 'fund' ? <DollarSign size={32} /> : modalType === 'restrict' ? <ShieldAlert size={32} /> : <MinusCircle size={32} />}
+                  modalType === 'restrict' ? (selectedUser.restrictionStatus?.isRestricted ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-slate-900 dark:bg-white'
+                } text-white dark:text-black`}>
+                  {modalType === 'restrict' ? (selectedUser.restrictionStatus?.isRestricted ? <UserCheck size={32} /> : <ShieldAlert size={32} />) : <PackageCheck size={32} />}
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                  {modalType.toUpperCase()} USER
+                  {modalType === "restrict" ? (selectedUser.restrictionStatus?.isRestricted ? "UNRESTRICT" : "RESTRICT") : modalType} USER
                 </h3>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{selectedUser.email}</p>
               </div>
 
               <div className="mb-10 text-left">
                 {modalType === "restrict" ? (
-                  <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-[2rem] border border-dashed border-slate-200 dark:border-white/10">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed font-medium">
-                      {selectedUser.adminFrozen 
-                        ? "Restoring access will allow the user to log in and use all platform features immediately."
-                        : "Restricting access will terminate current sessions and prevent the user from logging back in."}
+                  <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-[2rem] border border-dashed border-slate-200 dark:border-white/10 text-center">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 font-bold">
+                      {selectedUser.restrictionStatus?.isRestricted 
+                        ? "Do you want to unrestrict this user account?" 
+                        : "Please provide a reason for this restriction."}
                     </p>
-                    {!selectedUser.adminFrozen && (
+                    {!selectedUser.restrictionStatus?.isRestricted && (
                       <input 
                         type="text" 
-                        placeholder="Reason for restriction..." 
+                        value={reason}
+                        placeholder="Reason..." 
                         className="w-full bg-white dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none ring-1 ring-slate-200 dark:ring-white/5" 
-                        onChange={(e) => setDeductRemark(e.target.value)}
+                        onChange={(e) => setReason(e.target.value)}
                       />
                     )}
                   </div>
                 ) : modalType === "activate" ? (
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Select Plan</label>
-                    <select value={selectedPackageId} onChange={(e) => setSelectedPackageId(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-5 py-4 text-sm font-bold dark:text-white outline-none">
-                      {dbPackages.map((pkg) => <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>)}
-                    </select>
-                  </div>
+                  <select value={selectedPackageId} onChange={(e) => setSelectedPackageId(e.target.value)} className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-5 py-4 text-sm font-bold dark:text-white outline-none">
+                    {dbPackages.map((pkg) => <option key={pkg._id} value={pkg._id}>{pkg.name} — ${pkg.price}</option>)}
+                  </select>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Amount (USD)</label>
-                      <input type="number" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} placeholder="0.00" className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-6 py-5 text-2xl font-black dark:text-white outline-none" />
-                    </div>
-                    {modalType === "deduct" && (
-                      <input type="text" value={deductRemark} onChange={(e) => setDeductRemark(e.target.value)} placeholder="Deduction Remark..." className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-4 py-3 text-sm font-bold dark:text-white outline-none" />
-                    )}
-                  </div>
+                  <input type="number" value={fundAmount} onChange={(e) => setFundAmount(e.target.value)} placeholder="Amount (USD)" className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-2xl px-6 py-5 text-xl font-black dark:text-white outline-none" />
                 )}
               </div>
 
               <button
                 onClick={() => {
                   const uId = selectedUser._id;
-                  if (modalType === 'activate') handleAction(() => activateUserPackage(uId, selectedPackageId), "Provisioned");
-                  else if (modalType === 'fund') handleAction(() => fundUserPackage(uId, { amount: fundAmount }), "Capitalized");
-                  else if (modalType === 'deduct') handleAction(() => deductUserWallet(uId, { amount: fundAmount, remark: deductRemark }), "Debited");
-                  else if (modalType === 'restrict') {
-                    selectedUser.adminFrozen ? handleAction(() => unrestrictUser(uId), "Restored") : handleAction(() => restrictUser(uId, deductRemark || "Admin Action"), "Restricted");
+                  if (modalType === 'restrict') {
+                    selectedUser.restrictionStatus?.isRestricted 
+                      ? handleAction(() => unrestrictUser(uId), "Access Restored") 
+                      : handleAction(() => restrictUser(uId, reason), "User Restricted");
+                  } else if (modalType === 'activate') {
+                    handleAction(() => activateUserPackage(uId, selectedPackageId), "Package Activated");
+                  } else if (modalType === 'fund') {
+                    handleAction(() => fundUserPackage(uId, { amount: fundAmount }), "Capitalized");
+                  } else if (modalType === 'deduct') {
+                    handleAction(() => deductUserWallet(uId, { amount: fundAmount, remark: "Admin Action" }), "Debited");
                   }
                 }}
-                disabled={actionLoading}
-                className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all active:scale-95 shadow-2xl ${
-                  modalType === 'restrict' ? 'bg-amber-500 text-white' : 
-                  modalType === 'deduct' ? 'bg-rose-600 text-white' : 
-                  modalType === 'fund' ? 'bg-blue-600 text-white' : 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                disabled={actionLoading || (modalType === 'restrict' && !selectedUser.restrictionStatus?.isRestricted && !reason)}
+                className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all active:scale-95 ${
+                  actionLoading ? "bg-slate-400" : "bg-slate-900 dark:bg-white text-white dark:text-black shadow-xl"
                 }`}
               >
                 {actionLoading ? <Loader2 className="animate-spin mx-auto" size={18} /> : "Confirm Action"}
               </button>
               
-              <button onClick={handleCloseModal} className="mt-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">Abort Mission</button>
+              <button onClick={handleCloseModal} className="mt-6 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors">Abort</button>
             </motion.div>
           </div>
         )}
@@ -1069,7 +1612,6 @@ const UserTable = ({
   );
 };
 
-/* Internal UI Helpers */
 const ActionBtn = ({ onClick, icon, label, color }) => (
   <button 
     onClick={onClick} 
@@ -1084,11 +1626,11 @@ const ActionBtn = ({ onClick, icon, label, color }) => (
   </button>
 );
 
-const StatusBadge = ({ active, label, color = "emerald" }) => (
-  <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider 
+const StatusBadge = ({ active, label }) => (
+  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider w-fit
     ${active ? `bg-emerald-500/10 text-emerald-500` : `bg-rose-500/10 text-rose-500`}`}>
     <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-    {label}: {active ? "OK" : "NO"}
+    {label}: {active ? "Active" : "Restricted"}
   </div>
 );
 

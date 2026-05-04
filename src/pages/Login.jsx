@@ -183,7 +183,7 @@ import { login } from '../api/authApi';
 
 // Reusing the BackgroundSwitcher for consistent branding
 import bg1 from "../assets/hero.svg";
-import bg2 from "../assets/video1.mp4";
+import bg2 from "../assets/vid1.mp4";
 const backgroundMedia = [{ type: "image", src: bg1 }, { type: "video", src: bg2 }];
 
 function BackgroundSwitcher() {
